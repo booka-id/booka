@@ -10,12 +10,17 @@ Nama-nama anggota kelompok
 - Rayhan Dwi Sakha
 
 Cerita aplikasi yang diajukan serta manfaatnya
+(Semacam aplikasi untuk membeli buku disertai dengan tambahan fitur seperti event buku dan profile pembaca)
 
 Daftar modul yang akan diimplementasikan
 1. Book Catalogue
-2. Book Event
-3. Book Review
-4. Reading Profile
+   Menampilkan katalog buku yang tersedia untuk dibeli pengguna
+3. Book Event
+   Menampilkan event yang berafiliasi dengan organisasi kita. 
+5. Book Review
+   Menampilkan ulasan dari berbagai pengguna mengenai suatu buku yang tersedia di katalog kita
+7. Reading Profile
+   Menampilkan profil pengguna yang terdiri dari data diri pengguna, buku yang telah dibaca, serta wishlist (buku yang ingin dibeli)
    
 Sumber dataset katalog buku
 
