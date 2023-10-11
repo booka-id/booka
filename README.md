@@ -29,41 +29,41 @@ Dengan Booka, kami ingin mengubah pengalaman membaca Anda menjadi lebih dari sek
 
 ## Module Aplikasi
 1. Book Catalogue :
-   Menampilkan katalog buku yang tersedia untuk dibeli pengguna.
 
    Must Have Feature:
-      1. Pembelian buku
-      2. Browsing katalog buku
+      - Pembelian buku
+      - Browsing katalog buku
+
    Good to Have Feature:
-      1. Admin dapat memodifikasi katalog buku
+      - Admin dapat memodifikasi katalog buku
    
 2. Book Event :
-   Menampilkan event yang berafiliasi dengan organisasi kita.
 
    Must Have Feature:
-      1. Browsing event buku
-      2. Pendaftaran diri ke event
+      - Browsing event buku
+      - Pendaftaran diri ke event
+
    Good to Have Feature: 
-      1. Admin dapat memodifikasi katalog event
+      - Admin dapat memodifikasi katalog event
    
 3. Book Review :   
-   Menampilkan ulasan dari berbagai pengguna mengenai suatu buku yang tersedia di katalog kita
 
    Must Have Feature:
-      1. Thread Comment review buku serta rating buku menggunakan bintang
-      2. Daftar 10 buku dengan review tertinggi
+      - Thread Comment review buku serta rating buku menggunakan bintang
+      - Daftar 10 buku dengan review tertinggi
+
    Good to Have Feature: 
-      1. Admin dapat melakukan moderasi thread comment
+      - Admin dapat melakukan moderasi thread comment
    
 4. Reading Profile :
-   Menampilkan profil pengguna yang terdiri dari data diri pengguna, buku yang telah dibaca, serta wishlist (buku yang ingin dibeli)
 
    Must Have Feature:
-      1. Menampilkan profile user yang terdiri dari nama, foto profil, daftar teman, dan bio singkat
-      2. Browsing Profile user lain untuk ditambahkan ke friendlist
+      - Menampilkan profile user yang terdiri dari nama, foto profil, daftar teman, dan bio singkat
+      - Browsing Profile user lain untuk ditambahkan ke friendlist
+
    Good to Have Feature: 
-      1. Wishlist buku
-      2. Reading progress
+      - Wishlist buku
+      - Reading progress
    
 ## Dataset
 Pada proyek ini, kami menggunakan [Book Recommendation Dataset](https://www.kaggle.com/datasets/arashnic/book-recommendation-dataset/discussion) yang bersumber dari Kaggle.
@@ -71,6 +71,15 @@ Pada proyek ini, kami menggunakan [Book Recommendation Dataset](https://www.kagg
 ## Peran Pengguna 
 
 1. User Biasa:
-     Pengguna dapat membeli buku baik cetak maupun digital di aplikasi book catalogue. Pengguna dapat browsing serta mendaftarkan diri pada event yang ada. Pengguna dapat melihat review orang dari suatu buku serta dapat memberikan ulasan sendiri ketika telah membaca buku tersebut. Pengguna dapat menampilkan informasi mengenai dirinya, etc
+
+   - Membeli buku baik cetak dan digital di aplikasi book catalogue
+   - Melakukan browsing event yang tersedia di aplikasi book event serta dapat mendaftarkan dirinya ke event tersebut
+   - Memberikan ulasan kepada buku baik dalam bentuk rating maupun komentar
+   - Melakukan kostumisasi profil yang menampilkan informasi mengenai pengguna
+
+
 2. Admin:
-       Pengguna menambahkan, menghapus, mengubah kapasitas buku cetak, etc. Pengguna dapat menambahkan event baru di halaman event. Pengguna melakukan moderasi terhadap ulasan User Biasa, yang mana dapat menghapus review User Biasa ketika melanggar community guidelines
+   - Menambahkan, menghapus, mengubah kapasitas buku cetak yang ditampilkan di aplikasi book katalog
+   - Menambahkan event baru dan menghapus event yang telah berlalu
+   - Moderasi thread comment ulasan, serta menghapus ulasan yang dinilai melanggar community guidelines
+   - Melakukan kostumisasi profil yang menampilkan informasi mengenai pengguna
