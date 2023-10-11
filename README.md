@@ -3,7 +3,7 @@ Repo untuk tugas kelompok PBP
 
 ## Daftar isi
 1. [Anggota Kelompok](#meet-the-team)
-2. [Deskripsi Aplikasi](#what-is-placeholder)
+2. [Deskripsi Aplikasi](#what-is-booka)
 3. [Module Aplikasi](#module-aplikasi)
 4. [Dataset](#dataset)
 5. [Peran Pengguna](#peran-pengguna)
@@ -14,8 +14,18 @@ Repo untuk tugas kelompok PBP
 - Neina Akada Maula
 - Rayhan Dwi Sakha
 
-## What is "Placeholder"
-(Semacam aplikasi untuk membeli buku disertai dengan tambahan fitur seperti event buku dan profile pembaca)
+## What is Booka
+Di era digital yang terus berkembang, memperkenalkan Booka, aplikasi inovatif yang mendukung kecintaan Anda terhadap literatur. Booka hadir sebagai sahabat setia Anda untuk menjelajahi dunia literasi dengan cara yang tak terlupakan.
+
+   - Bayangkan Anda memiliki perpustakaan pribadi yang tak terbatas, tetapi berada di ujung jari Anda. Dengan **Book Catalogue**, Anda dapat menjelajahi ribuan buku dari berbagai genre dan penulis. 
+
+   - Booka tak hanya tentang halaman buku, tetapi juga tentang acara dan kegiatan yang berkaitan dengan dunia literasi. Ikuti acara penulis kesukaan Anda, bergabung dengan kelompok diskusi buku yang seru, dan daftarkan diri Anda pada acara-acara menarik lainnya dengan fitur **Book Event**.
+
+   - Terkadang, memilih buku bacaan dapat menjadi sebuah tantangan. Itu sebabnya, **Book Review** hadir untuk membantu Anda dengan menghadirkan ulasan dan rekomendasi dari pembaca lain. Bagikan pandangan Anda atau temukan pandangan yang cocok dengan selera Anda. Dalam Booka, dunia buku akan terasa lebih dekat dan terhubung.
+
+   - Di dalam Booka, Anda bukan sekadar seorang pembaca, melainkan pribadi yang menciptakan cerita literasi sendiri. Dengan **Reading Profile**, Anda dapat membangun profil pribadi Anda. Catat buku-buku yang telah Anda baca dan buat daftar buku yang ingin Anda tambahkan ke wishlist. 
+
+Dengan Booka, kami ingin mengubah pengalaman membaca Anda menjadi lebih dari sekadar aktivitas membaca, melainkan pengalaman yang mendalam, berarti, dan terhubung. Selamat datang di Booka, di mana dunia literasi berada di genggaman Anda.
 
 ## Module Aplikasi
 1. Book Catalogue :
