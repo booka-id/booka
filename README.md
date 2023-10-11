@@ -65,8 +65,8 @@ Dengan Booka, kami ingin mengubah pengalaman membaca Anda menjadi lebih dari sek
       1. Wishlist buku
       2. Reading progress
    
-## dataset
-
+## Dataset
+Pada proyek ini, kami menggunakan [Book Recommendation Dataset](https://www.kaggle.com/datasets/arashnic/book-recommendation-dataset/discussion) yang bersumber dari Kaggle.
 
 ## Peran Pengguna 
 
