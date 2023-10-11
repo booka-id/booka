@@ -2,11 +2,11 @@
 Repo untuk tugas kelompok PBP
 
 ## Daftar isi
-[Anggota Kelompok](#meet-the-team)
-[Deskripsi Aplikasi](#what-is-placeholder)
-[Module Aplikasi](#module-aplikasi)
-[Dataset](#dataset)
-[Peran Pengguna](#peran-pengguna)
+1. [Anggota Kelompok](#meet-the-team)
+2. [Deskripsi Aplikasi](#what-is-placeholder)
+3. [Module Aplikasi](#module-aplikasi)
+4. [Dataset](#dataset)
+5. [Peran Pengguna](#peran-pengguna)
 
 ## Meet The Team 
 - Muh. Syarief Mulyadi
@@ -20,34 +20,38 @@ Repo untuk tugas kelompok PBP
 ## Module Aplikasi
 1. Book Catalogue :
    Menampilkan katalog buku yang tersedia untuk dibeli pengguna.
-      Must Have Feature:
+
+   Must Have Feature:
       1. Pembelian buku
       2. Browsing katalog buku
-      Good to Have Feature:
+   Good to Have Feature:
       1. Admin dapat memodifikasi katalog buku
    
 2. Book Event :
    Menampilkan event yang berafiliasi dengan organisasi kita.
-      Must Have Feature:
+
+   Must Have Feature:
       1. Browsing event buku
       2. Pendaftaran diri ke event
-      Good to Have Feature: 
+   Good to Have Feature: 
       1. Admin dapat memodifikasi katalog event
    
 3. Book Review :   
    Menampilkan ulasan dari berbagai pengguna mengenai suatu buku yang tersedia di katalog kita
-     Must Have Feature:
+
+   Must Have Feature:
       1. Thread Comment review buku serta rating buku menggunakan bintang
       2. Daftar 10 buku dengan review tertinggi
-      Good to Have Feature: 
+   Good to Have Feature: 
       1. Admin dapat melakukan moderasi thread comment
    
 4. Reading Profile :
    Menampilkan profil pengguna yang terdiri dari data diri pengguna, buku yang telah dibaca, serta wishlist (buku yang ingin dibeli)
-     Must Have Feature:
+
+   Must Have Feature:
       1. Menampilkan profile user yang terdiri dari nama, foto profil, daftar teman, dan bio singkat
       2. Browsing Profile user lain untuk ditambahkan ke friendlist
-      Good to Have Feature: 
+   Good to Have Feature: 
       1. Wishlist buku
       2. Reading progress
    
