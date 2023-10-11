@@ -1,4 +1,4 @@
-# Placeholder
+# Booka
 Repo untuk tugas kelompok PBP
 
 ## Daftar isi
