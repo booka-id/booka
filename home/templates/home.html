@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <H1>Booka</H1>
+    <ul>
+        <h2>{{user}}</h2>
+        <button>Book Catalogue</button>
+        <button>Book Event</button>
+        <button>Book Review</button>
+        <a href="{% url 'user_profile:show_profile' %}"><button>Profile</button></a>
+        
+    </ul>
+
+    {% if user !=  'guest'%}
+        <a href="{% url 'home:logout' %}"><button>Logout</button></a>
+    {% endif %}
+
+{% endblock content %}
