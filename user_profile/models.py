@@ -42,7 +42,7 @@ class User(AbstractUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
-    REQUIRED_FIELDS = ['user_name','first_name', 'first_name']
+    REQUIRED_FIELDS = ['user_name','first_name', 'last_name']
 
     class Meta:
         verbose_name = 'User'
