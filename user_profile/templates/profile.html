@@ -4,6 +4,9 @@
     <H1>Booka</H1>
     <ul>
         <li>Welcome {{user.first_name}}</li>
+        <li>
+            <img class="rounded-circle account-img" src="{{ user.profile_pic.url }}">
+        </li>
         <li>{{user.email}}</li>
         <li>{{user.bio}}</li>
     </ul>
