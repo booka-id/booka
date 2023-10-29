@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+<title>
+    Review
+</title>
+<style>
+    .books{
+        background-color: lightblue;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    img{
+        height: 250px;
+        width: auto;
+        object-fit: cover;
+    }
+
+    .book-card{
+        border: 1px solid red;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .book-detail{
+        padding: 0 1rem;
+    }
+
+    .hidden{
+        display:none;
+    }
+
+    .selector{
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .tab{
+        border: unset;
+        background-color: unset;
+    }
+
+    .tab.active{
+        color:green
+    }
+
+    @media screen and (max-width: 600px) {
+        .contents {
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock meta %}
+
+{% block content%}
+
+<h1>Books</h1>
+
+<div class="container-lg" style="display: flex;justify-content: center;">
+    <div class="contents" style="width: 75%;">
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="pills-feeds-tab" data-bs-toggle="pill" data-bs-target="#pills-feeds" type="button" role="tab" aria-controls="pills-feeds" aria-selected="true">
+                Feeds
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="pills-books-tab" data-bs-toggle="pill" data-bs-target="#pills-books" type="button" role="tab" aria-controls="pills-books" aria-selected="false">
+                By Books
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="pills-myreviews-tab" data-bs-toggle="pill" data-bs-target="#pills-myreviews" type="button" role="tab" aria-controls="pills-myreviews" aria-selected="false">
+                My Reviews
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" id="pills-feeds" role="tabpanel" aria-labelledby="pills-feeds-tab">...</div>
+            <div class="tab-pane fade" id="pills-books" role="tabpanel" aria-labelledby="pills-books-tab">
+                <div class="form-wrapper">
+                    <form>
+                        <label for="filter">Filter by author:</label>
+                        <select name="filter" id="filter" onchange="refreshFiltered(this)">
+                            <option value=""></option>
+                            {% for author in authors %}
+                            <option value="{{author}}">{{author|title}}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+                <div class="books">
+                    ...
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pills-myreviews" role="tabpanel" aria-labelledby="pills-myreviews-tab">...</div>
+          </div>
+    </div>
+    <aside style="width: 25%;" class="d-none d-md-block">
+        <div class="ranks">
+            
+        </div>
+    </aside>
+</div>
+
+<script>
+    // TAB SWITCH FUNCTIONALITY
+    // const tabs = document.querySelectorAll('.tab')
+    // const contents = document.querySelectorAll('.content')
+
+    // tabs.forEach((tab,index) => {
+    //     tab.addEventListener('click', ()=>{
+    //         tabs.forEach(tab => tab.classList.remove('active'))
+    //         tab.classList.add('active')
+    //     })
+    // })
+    // GET FUNCTIONS
+    async function getBooks(){
+        return fetch('{% url "book:get_books" %}').then(res => res.json())
+    }
+    async function getAllReviews(){
+        return fetch('{% url "review:get_all_reviews" %}').then( res => res.json())
+    }
+    async function getUser(id){
+        let url = "/review/get_user/" + id
+        return fetch(url).then( res => res.json())
+    }
+    async function getUserReview(id){
+        let url = "/review/user/" + id
+        return fetch(url).then( res => res.json())
+    }
+    async function getBook(id){
+        let url = "/review/books/" + id
+        return fetch(url).then( res => res.json())
+    }
+
+    async function getRanks(){
+        return fetch('{% url "review:get_ranks" %}').then(res => res.json())
+    }
+    async function getRatingRanks(){
+        return fetch('{% url "review:get_rating_ranks" %}').then(res => res.json())
+    }
+
+    async function getReviews(id){
+        let url = "/review/get_reviews/" + id
+        return fetch(url).then( res => res.json())
+    }
+    function deleteReview(id){
+        let url = "/review/delete/" + id
+        fetch(url, {method:"DELETE"}).then(refreshReviews)
+    }
+    
+    // REFRESH FUNCTIONS
+    async function refreshBooks(){
+        const content = document.querySelector('.books')
+        content.innerHTML = ""
+        const books = await getBooks();
+        let htmlString = ``;
+        books.forEach( book => {
+            htmlString += `<div class="card" style="width: 18rem;">
+            <img src="${book.fields.image_url_large}" class="card-img-top" alt="${book.fields.title}">
+            <div class="card-body">
+                <h5 class="card-title">${book.fields.title}</h5>
+                <p class="card-text">Written by ${book.fields.author}</p>
+                <a href="${book.pk}" class="btn btn-primary">See reviews</a>
+            </div>
+            </div>`
+        })
+        content.innerHTML = htmlString;
+    }
+    
+
+    async function refreshFiltered(dropdown){
+        let author = dropdown.options[dropdown.selectedIndex].value;
+        if(author == ''){refreshBooks(); return}
+        let url = `/review/books/${author}`
+        let books = await fetch(url).then(res=>res.json())
+
+        const content = document.querySelector('.books')
+        content.innerHTML = ""
+        let htmlString = ``;
+        books.forEach( book => {
+            htmlString += `<div class="card" style="width: 18rem;">
+            <img src="${book.fields.image_url_large}" class="card-img-top" alt="${book.fields.title}">
+            <div class="card-body">
+                <h5 class="card-title">${book.fields.title}</h5>
+                <p class="card-text">Written by ${book.fields.author}</p>
+                <a href="${book.pk}" class="btn btn-primary">See reviews</a>
+            </div>
+            </div>`
+        })
+        content.innerHTML = htmlString;
+    }
+
+    async function refreshReviews(){
+        const content = document.querySelector('#pills-feeds')
+        content.innerHTML = ""
+        const reviews = await getAllReviews()
+        let htmlString = ``;
+        let isAdmin = '{{user.is_superuser}}'== 'True'
+        for(const review of reviews){
+            let userId = review.fields.user
+            let user = await getUser(userId)
+            let book = await getBook(review.fields.book)
+            htmlString += `<div class="review-card">
+            <h3>${book[0].fields.title}</h3>
+            <p>Review by ${user[0].fields.username}`
+            
+            if(user[0].fields.is_superuser == true){
+                htmlString += `<sub style="color:red;">(admin)</sub>`
+            }
+
+            htmlString+=`</p>
+            <p>Rated ${review.fields.rating}/5</p>
+            <p>${review.fields.content}</p>
+            `
+            if('{{user.pk}}' == userId || isAdmin){
+                htmlString +=
+                `<button onclick=deleteReview(${review.pk})>
+                    Delete this review
+                </button>`
+            }
+            htmlString+=`</div>`
+        }
+        content.innerHTML = htmlString
+    }
+    async function refreshUserReviews(){
+        let isLogin = '{{user}}' != 'AnonymousUser'
+        const content = document.querySelector('#pills-myreviews')
+        content.innerHTML = ""
+        if(isLogin){
+            const reviews = await getUserReview('{{user.id}}')
+            let htmlString = ``;
+            let isAdmin = '{{user.is_superuser}}'== 'True'
+            for(const review of reviews){
+                let userId = review.fields.user
+                let user = await getUser(userId)
+                let book = await getBook(review.fields.book)
+                htmlString += `<div class="review-card">
+                <h3>${book[0].fields.title}</h3>
+                <p>Review by ${'{{user.username}}'}`
+                
+                if(user[0].fields.is_superuser == true){
+                    htmlString += `<sub style="color:red;">(admin)</sub>`
+                }
+    
+                htmlString+=`</p>
+                <p>Rated ${review.fields.rating}/5</p>
+                <p>${review.fields.content}</p>
+                `
+                htmlString +=
+                `<button onclick=deleteReview(${review.pk})>
+                    Delete this review
+                </button></div>`
+            }
+            content.innerHTML = htmlString
+        }else{
+            content.innerHTML = `
+            <h1>Login to see this page!</h1>
+            <a href="{% url 'home:login' %}"><button>Login</button></a>`
+        }
+    }
+    
+    async function showRanks(){
+        let top_books = await getRanks()
+        console.log(top_books)
+        const content = document.querySelector('.ranks')
+        content.innerHTML = ""
+        let htmlString = `<h2>Hot Topics</h2>`;
+        for(let i=0;i<top_books.length; i++){
+            const book = top_books[i]
+            reviews = await getReviews(book.pk)
+            htmlString +=
+            `<div class="rankings-card">
+                <h3>${i+1}. ${book.fields.title}</h3>
+                <p>by ${book.fields.author}</p>
+                <p style="color: blue;">${reviews.length} reviews</p>
+                </div>`
+            }
+            content.innerHTML = htmlString
+    }
+    async function showRatingRanks(){
+        let top_books = await getRatingRanks()
+        const content = document.querySelector('.ranks')
+        content.innerHTML = ""
+        let htmlString = `<h2>Hot Topics</h2>`;
+        for(let i=0;i<top_books.length; i++){
+            const book = top_books[i]
+            if(book.avg_rating!=null){
+                const reviews = await getReviews(book.id)
+                htmlString +=
+                `<div class="rankings-card">
+                    <h3>${i+1}. ${book.title}</h3>
+                    <p>by ${book.author}</p>
+                    <p style="color: blue;">${roundToTwo(book.avg_rating)}/5 | ${reviews.length} reviews</p>
+                    </div>`
+                }
+                content.innerHTML = htmlString
+            }
+    }
+
+    function roundToTwo(num) {
+        return +(Math.round(num + "e+2")  + "e-2");
+    }
+    
+    refreshBooks();
+    showRatingRanks();
+    refreshReviews();
+    refreshUserReviews();
+</script>
+{% endblock %}
+
+<!-- {% for review in reviews %}
+<div class="review-card">
+    <img src="{{review.book.imgURL}}" alt="" class="book-cover">
+    <a href="" class="title">{{review.title}}</a>
+    <div class="stars">
+        *****
+    </div>
+</div>
+{% endfor %} -->
