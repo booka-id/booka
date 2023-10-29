@@ -1,11 +1,13 @@
 from user_profile.forms import RegisterForm, ChangeForm
+from user_profile.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages  
-import datetime
-from django.http import HttpResponseRedirect
+import datetime, json
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
+
 
 def show_home(request):  
     if request.user.is_authenticated:
@@ -53,5 +55,19 @@ def logout_user(request):
     response.delete_cookie('last_login')
     return response
 
+def edit_profile(request, id):
+    # Get product berdasarkan ID
+    product = User.objects.get(pk = id)
+
+    # Set product sebagai instance dari form
+    form = ChangeForm(request.POST or None, instance=product)
+
+    if form.is_valid() and request.method == "POST":
+        # Simpan form dan kembali ke halaman awal
+        form.save()
+        return HttpResponseRedirect(reverse('user_profile:show_profile'))
+
+    context = {'form': form}
+    return render(request, "edit_profile.html", context)
 
 # Create your views here.

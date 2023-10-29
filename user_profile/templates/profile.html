@@ -2,27 +2,49 @@
 {% load static %}
 {% block content %}
 
+<h2>Welcome {{user.username}}</h2>
 
-    <h1>Booka</h1>
-    <ul>
-        <li>Welcome {{user.first_name}}</li>
-        <li>
-            {% if user.profile_pic %}
-                <img class="rounded-circle account-img" src="{{ user.profile_pic.url }}">
-            {% else %}
-                <img class="rounded-circle account-img" src="{% static 'userprofile/default.png' %}" width="200px" height="200px">
-            {% endif %}
-        </li>
-        <li>{{user.email}}</li>
-        <li>{{user.bio}}</li>
-        <li>
+    {% if user.profile_pic %}
+        <img class="rounded-circle account-img" src="{{ user.profile_pic.url }}" width="200px" height="200px">
+    {% else %}
+        <img class="rounded-circle account-img" src="{% static 'userprofile/default.png' %}" width="200px" height="200px">
+    {% endif %}
+<h4>{{user.email}}</h4>
+<h4>{{user.bio}}</h4>
 
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Change Favorite Book</button>
-        </li>
-           </ul>
-<div class="container">
-    <div class="row row-cols-1 row-cols-md-6 g-8" id="favoriteBooks"></div>
+
+<a href="{% url 'home:edit_profile' user.pk %}">
+    <button>
+        Edit
+    </button>
+</a>
+        
+<input
+    type="text"
+    class="form-control dropdown-toggle"
+    data-bs-toggle="dropdown"
+    id="username-input"
+    placeholder="Lookup other people profile"
+    autocomplete="off"
+>
+<ul class="dropdown-menu" id="userlookup-dropdown-field"></ul>
+
+<div class="container border border-black border-radius">
+
 </div>
+<div class="container border border-black border-radius">
+    <h4>Favorite Book</h4>
+    <div class="row row-cols-1 row-cols-md-6 g-8" id="favoriteBooks"></div>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Change Favorite Book</button>
+</div>
+
+<div class="container border border-black border-radius">
+    <h4>Wishlist </h4>
+    <div class="row row-cols-1 row-cols-md-6 g-8" id="wishlistBook"></div>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#wishlistModal">Change Wishlist</button>
+</div>
+
+
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -66,15 +88,74 @@
         </div>
     </div>
 
+    <div class="modal fade" id="wishlistModal" tabindex="-1" aria-labelledby="wishlistModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="wishlistModalLabel">Add to Wishlist</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="wishlistForm" onsubmit="return false;">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <div class="dropdown">
+                                <input
+                                    type="text"
+                                    class="form-control dropdown-toggle"
+                                    data-bs-toggle="dropdown"
+                                    id="wishlist-title-input"
+                                    placeholder="Type of book title"
+                                    autocomplete="off"
+                                >
+                                <input type="hidden" id="email" name="email" value="{{user.email}}">
+                                <input type="hidden" id="wishlist-json" name="json_data">
+                                <ul class="dropdown-menu" id="wishlist-dropdown-field"></ul>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="wishlist-selected-book" class="col-form-label">Selected:</label>
+                            <div id="wishlistTempatBuku" name="wishlist-selected-book"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="wishlist-button-close" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="wishlist-button-clear">Clear Selected Books</button>
+                    <button type="button" class="btn btn-primary" id="wishlist-button-add" data-bs-dismiss="modal">Add to Wishlist</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const bookByTitleURL = "{% url 'book:book_by_title' %}";
         const getFavoriteBookURL = "{% url 'user_profile:get_favorite_book' user.email %}";
         const addFavoriteBookURL = "{% url 'user_profile:add_favorite_book' %}";
-
+        const getWishlistURL = "{% url 'user_profile:get_wishlist' user.email %}";
+        const addWishlistURL = "{% url 'user_profile:add_wishlist' %}";
+        const userByUsername = "{% url 'user_profile:user_by_username' %}";
+      
+        
         async function getProducts(search_term) {
             const url = bookByTitleURL;
             const payloadData = {
                 title: search_term,
+            };
+            const request = new Request(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payloadData),
+            });
+
+            return fetch(request).then((res) => res.json());
+        }
+        async function getUser(search_term) {
+            const url = userByUsername;
+            const payloadData = {
+                username: search_term,
             };
             const request = new Request(url, {
                 method: "POST",
@@ -151,6 +232,7 @@
         async function addFavoriteBooks() {
             const form = document.getElementById("favoriteBookForm");
             const formData = new FormData(form);
+            console.log(formData)
 
             fetch(addFavoriteBookURL, {
                 method: "POST",
@@ -210,5 +292,173 @@
         document.getElementById("button_close").onclick = clearFavoriteBooks;
         document.getElementById("button_clear").onclick = clearFavoriteBooks;
         document.getElementById("button_add").onclick = addFavoriteBooks;
+        
+        const wishlistModal = document.getElementById("wishlistModal");
+        const wishlistTitleInput = document.getElementById("wishlist-title-input");
+        const wishlistDropdownField = document.getElementById("wishlist-dropdown-field");
+        const wishlistJsonInput = document.getElementById("wishlist-json");
+
+        // Initialize the selectedBooks array for Wishlist
+        const wishlistSelectedBooks = [];
+        if (wishlistJsonInput.value) {
+            const savedWishlistBooks = JSON.parse(wishlistJsonInput.value);
+            wishlistSelectedBooks.push(...savedWishlistBooks);
+        }
+
+        async function rebuildWishlistAutoCompletionList() {
+            const search_term = wishlistTitleInput.value;
+
+            // Clear the dropdown when input is empty
+            if (!search_term) {
+                wishlistDropdownField.innerHTML = "";
+                return;
+            }
+
+            try {
+                const book = await getProducts(search_term);
+
+                wishlistDropdownField.innerHTML = "";
+
+                book.forEach((item) => {
+                    const btn = document.createElement("button");
+                    btn.classList.add("dropdown-item");
+                    btn.textContent = item.title;
+
+                    btn.addEventListener("click", () => {
+                        const wishlistTempatBukuDiv = document.getElementById("wishlistTempatBuku");
+
+                        wishlistSelectedBooks.push(item);
+
+                        wishlistTempatBukuDiv.innerHTML += `
+                        <div>
+                            <img src="${item.image_url_medium}">
+                            <p>${item.title}</p>
+                        </div>`;
+
+                        wishlistJsonInput.value = JSON.stringify(wishlistSelectedBooks);
+
+                        wishlistTitleInput.value = "";
+                        wishlistDropdownField.innerHTML = "";
+                    });
+
+                    wishlistDropdownField.appendChild(btn);
+                });
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        async function clearWishlistBooks() {
+            const wishlistTempatBukuDiv = document.getElementById("wishlistTempatBuku");
+            wishlistSelectedBooks.length = 0; // Clear the selectedBooks array
+
+            wishlistTempatBukuDiv.innerHTML = "";
+            wishlistJsonInput.value = "";
+        }
+
+        async function addWishlistBooks() {
+            const formWish = document.getElementById("wishlistForm");
+            const formDataWish = new FormData(formWish);
+            console.log(formDataWish);
+
+            fetch(addWishlistURL, {
+                method: "POST",
+                body: formDataWish,
+            })
+                .then((response) => response.json())
+                .then(() => {
+                    clearWishlistBooks();
+                    refreshWishlistBooks();
+                });
+
+            formWish.reset();
+            return false;
+        }
+
+        async function getWishlist() {
+            return fetch(getWishlistURL).then((response) => response.json());
+        }
+
+        // Refresh Wishlist Books
+        async function refreshWishlistBooks() {
+            const data = await getWishlist();
+            const wishlistBooksDiv = document.getElementById("wishlistBook"); // Use the same div as Favorite Books
+            wishlistBooksDiv.innerHTML = "";
+            if (data.wishlist) {
+                const wishlistBookData = JSON.parse(data.wishlist);
+
+                if (!Array.isArray(wishlistBookData)) {
+                    wishlistBookData = [wishlistBookData];
+                }
+
+                let html = "";
+
+                wishlistBookData.forEach((item) => {
+                    html += `
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="${item.image_url_large}" class="card-img-top" alt="${item.title}" height="200px" width="200px">
+                            <div class="card-body">
+                                <p class="card-title text-small">${item.title}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                wishlistBooksDiv.innerHTML = html;
+            }
+        }
+
+        refreshWishlistBooks();
+
+        // Add Wishlist event listeners
+        wishlistTitleInput.addEventListener("input", rebuildWishlistAutoCompletionList);
+        document.getElementById("wishlist-button-close").onclick = clearWishlistBooks;
+        document.getElementById("wishlist-button-clear").onclick = clearWishlistBooks;
+        document.getElementById("wishlist-button-add").onclick = addWishlistBooks;
+
+        let dummy = "initial_value";
+
+async function rebuildAutoCompletionUserList() {
+    const inputField = document.getElementById("username-input");
+    const search_term = inputField.value;
+    const field = document.getElementById("userlookup-dropdown-field");
+
+    // Clear the dropdown when input is empty
+    if (!search_term) {
+        field.innerHTML = "";
+        return;
+    }
+
+    try {
+        const users = await getUser(search_term);
+        field.innerHTML = "";
+
+        users.forEach(async (user) => {
+            dummy = user.username; // Update the dummy with the user's username
+            const button = document.createElement("button");
+            button.classList.add("dropdown-item");
+            button.textContent = user.first_name + ' ' + user.last_name;
+
+            // Create the user profile URL dynamically based on the username
+            const goToUserProfile = `go_to/${dummy}/`;
+
+            button.addEventListener("click", () => {
+                window.location.href = goToUserProfile; // Navigate to the user's profile page
+                wishlistTitleInput.value = "";
+                wishlistDropdownField.innerHTML = "";
+            });
+
+            field.appendChild(button);
+        });
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+        document.getElementById("username-input").addEventListener("input", rebuildAutoCompletionUserList);
+
+    
+
     </script>
 {% endblock content %}

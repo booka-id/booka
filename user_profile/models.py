@@ -31,6 +31,7 @@ class CostumUserManager(UserManager):
 class User(AbstractUser, PermissionsMixin):
     profile_pic = models.ImageField(null=True ,blank=True, upload_to='profile_pics/')
     favorite_book = models.JSONField(default=dict, null=True, blank=True)
+    wishlist = models.JSONField(default=dict, null=True, blank=True)
     bio = models.TextField(_('bio'), max_length=500, blank=True)
     email= models.EmailField(_('email'),blank=True, default='', unique=True)
     first_name = models.CharField(max_length=255, blank=True, default='')
