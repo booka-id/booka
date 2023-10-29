@@ -2,7 +2,6 @@
 
 {% block content %}
     <h1>Katalog Buku</h1>
-    <a href="{% url 'catalogue:add_book' %}">Tambah Buku</a>
     <ul>
         {% for book in tes %}
             <li>
@@ -11,28 +10,6 @@
                 <p>Penulis: {{ book.book.author }}</p>
                 <p>Harga: {{ book.price }}</p>
                 <a href="{% url 'catalogue:detail_book' book.book.pk %}">Lihat Detail</a>
-                <form action="{% url 'catalogue:buy_book' book.pk %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit">Beli</button>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
-
-{% endblock content %}
-
-{% extends 'base.html' %}
-
-{% block content %}
-    <h1>Katalog Buku</h1>
-    <ul>
-        {% for book in books %}
-            <li>
-                <h2>{{ book.title }}</h2>
-                <p>Penulis: {{ book.author }}</p>
-                <p>Tahun Terbit: {{ book.year }}</p>
-                <img src="{{ book.image_url_large }}" alt="{{ book.title }} Image">
-                <a href="{% url 'catalogue:detail_book' book.pk %}">Lihat Detail</a>
                 <form action="{% url 'catalogue:buy_book' book.pk %}" method="post">
                     {% csrf_token %}
                     <button type="submit">Beli</button>

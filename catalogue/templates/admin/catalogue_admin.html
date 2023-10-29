@@ -3,18 +3,59 @@
 {% block content %}
     <h1>Katalog Buku</h1>
     <a href="{% url 'catalogue:add_book' %}">Tambah Buku</a>
-    <ul>
+
+    <div id="search-container">
+        <input type="text" id="search-input" placeholder="Cari buku...">
+        <button id="search-button">Cari</button>
+    </div>
+
+    <ul id="result-list">
         {% for book in tes %}
             <li>
                 <img src="{{ book.book.image_url_large }}" alt="{{ book.book.title }} Image">
                 <h2>{{ book.book.title }}</h2>
                 <p>Penulis: {{ book.book.author }}</p>
                 <p>Harga: {{ book.price }}</p>
-                <a href="{% url 'catalogue:detail_book' book.book.pk %}">Lihat Detail</a>
+                <a href="{% url 'catalogue:detail_book' book.pk %}">Lihat Detail</a>
                 <a href="{% url 'catalogue:edit_book' book.pk %}">Edit Book</a>
                 <a href="{% url 'catalogue:delete_book' book.pk %}">Delete Book</a>
             </li>
         {% endfor %}
     </ul>
-
 {% endblock content %}
+
+{% block javascript %}
+    <script>
+        async function searchBooks(query) {
+            const response = await fetch(`{% url 'catalogue:search_book' %}?search_query=${query}`);
+            const data = await response.json();
+            return data;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
+            const resultList = document.getElementById('result-list');
+
+            searchButton.addEventListener('click', async () => {
+                const query = searchInput.value;
+                const results = await searchBooks(query);
+                resultList.innerHTML = '';
+
+                results.forEach(book => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <img src="${book.image_url_large}" alt="${book.title} Image">
+                        <h2>${book.title}</h2>
+                        <p>Penulis: ${book.author}</p>
+                        <p>Harga: ${book.price}</p>
+                        <a href="{% url 'catalogue:detail_book' %}/${book.pk}">Lihat Detail</a>
+                        <a href="{% url 'catalogue:edit_book' %}/${book.pk}">Edit Book</a>
+                        <a href="{% url 'catalogue:delete_book' %}/${book.pk}">Delete Book</a>
+                    `;
+                    resultList.appendChild(listItem);
+                });
+            });
+        });
+    </script>
+{% endblock javascript %}

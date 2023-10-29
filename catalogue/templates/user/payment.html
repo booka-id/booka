@@ -2,13 +2,18 @@
 
 {% block content %}
     <h1>Halaman Pembayaran</h1>
-    
     <h2>Detail Buku:</h2>
-    <p>Judul: {{ book.title }}</p>
-    <p>Penulis: {{ book.author }}</p>
-    <p>Tahun Terbit: {{ book.year }}</p>
-    <p>Penerbit: {{ book.publisher }}</p>
-    <img src="{{ book.image_url_large }}" alt="{{ book.title }} Image">
-    
+    <p>Anda membeli buku {{ book.book.title }} dengan harga Rp{{book.price}}</p>
+    <form method="post" action="{% url 'catalogue:pay_book' pk=book.pk %}">
+        {% csrf_token %}
+        <label>Metode Pembayaran:</label><br>
+        <label for="credit_card">Kartu Kredit</label>
+        <input type="radio" name="payment_method" id="credit_card" value="credit_card"><br>
+        
+        <label for="bank_transfer">Transfer Bank</label>
+        <input type="radio" name="payment_method" id="bank_transfer" value="bank_transfer"><br>
+        
+        <button type="submit">Bayar</button>
+    </form>
 
 {% endblock %}
