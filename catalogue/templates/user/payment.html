@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Halaman Pembayaran</h1>
+    
+    <h2>Detail Buku:</h2>
+    <p>Judul: {{ book.title }}</p>
+    <p>Penulis: {{ book.author }}</p>
+    <p>Tahun Terbit: {{ book.year }}</p>
+    <p>Penerbit: {{ book.publisher }}</p>
+    <img src="{{ book.image_url_large }}" alt="{{ book.title }} Image">
+    
+
+{% endblock %}
