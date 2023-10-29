@@ -1,37 +1,76 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    <H1>Booka</H1>
+
+
+    <h1>Booka</h1>
     <ul>
         <li>Welcome {{user.first_name}}</li>
         <li>
             {% if user.profile_pic %}
-                <img class="rounded-circle account-img" src="{{ user.profile_pic.url }}" width="200px" height="200px" >
+                <img class="rounded-circle account-img" src="{{ user.profile_pic.url }}">
             {% else %}
                 <img class="rounded-circle account-img" src="{% static 'userprofile/default.png' %}" width="200px" height="200px">
             {% endif %}
         </li>
         <li>{{user.email}}</li>
         <li>{{user.bio}}</li>
-    </ul>
-    <div>
-        <div class="dropdown">
-            <input
-                type="text"
-                class="form-control"
-                id="title-input"
-                placeholder="Type of book title"
-                autocomplete="off"
-                >
-                <ul class="dropdown-menucan" id="dropdown_field"><!-- Build dynamically --></ul>
-          </div>
+        <li>
+
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Change Favorite Book</button>
+        </li>
+           </ul>
+<div class="container">
+    <div class="row row-cols-1 row-cols-md-6 g-8" id="favoriteBooks"></div>
+</div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Change Favorite Book</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="favoriteBookForm" onsubmit="return false;">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <div class="dropdown">
+                                <input
+                                    type="text"
+                                    class="form-control dropdown-toggle"
+                                    data-bs-toggle="dropdown"
+                                    id="title-input"
+                                    placeholder="Type of book title"
+                                    autocomplete="off"
+                                >
+                                <input type="hidden" id="email" name="email" value="{{user.email}}">
+                                <input type="hidden" id="send_json" name="json_data">
+                                <ul class="dropdown-menu" id="dropdown_field"></ul>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="selected_book" class="col-form-label">Selected:</label>
+                            <div id="tempatBukuFavorit" name="selected_book"></div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="button_close" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="button_clear">Clear Selected Books</button>
+                    <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Save Favorite Books</button>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <div id="tempat buku favorit"></div>
+
     <script>
-        const bookByTitleURL = "{% url 'book:book_by_title' %}";  // Replace 'book_by_title' with the actual URL name in your Django project
-        
-    
+        const bookByTitleURL = "{% url 'book:book_by_title' %}";
+        const getFavoriteBookURL = "{% url 'user_profile:get_favorite_book' user.email %}";
+        const addFavoriteBookURL = "{% url 'user_profile:add_favorite_book' %}";
+
         async function getProducts(search_term) {
             const url = bookByTitleURL;
             const payloadData = {
@@ -41,21 +80,26 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-    
                 },
                 body: JSON.stringify(payloadData),
             });
-            console.log(request.body)
-    
+
             return fetch(request).then((res) => res.json());
         }
-    
+
+        // Initialize the selectedBooks array outside the function
+        const selectedBooks = [];
+        const jsonInput = document.getElementById("send_json");
+        if (jsonInput.value) {
+            const savedBooks = JSON.parse(jsonInput.value);
+            selectedBooks.push(...savedBooks);
+        }
+
         async function rebuildAutoCompletionList() {
-            const input_field = document.getElementById("title-input");
-            const search_term = input_field.value;
-            console.log(search_term);
+            const inputField = document.getElementById("title-input");
+            const search_term = inputField.value;
             const field = document.getElementById("dropdown_field");
-            
+
             // Clear the dropdown when input is empty
             if (!search_term) {
                 field.innerHTML = "";
@@ -64,37 +108,107 @@
 
             try {
                 const book = await getProducts(search_term);
-                console.log("Book data:", book);
 
                 field.innerHTML = "";
 
                 book.forEach((item) => {
-                    let li = document.createElement("li");
-                    let btn = document.createElement("button");
-                    btn.textContent = item.title; 
-                    li.innerHTML = btn
+                    const btn = document.createElement("button");
+                    btn.classList.add("dropdown-item");
+                    btn.textContent = item.title;
 
                     btn.addEventListener("click", () => {
-                        // Populate "tempat buku favorit" div with the selected item's data
-                        const tempatBukuFavoritDiv = document.getElementById("test");
-                        tempatBukuFavoritDiv.innerHTML += JSON.stringify(item, null, 2);
+                        const tempatBukuFavoritDiv = document.getElementById("tempatBukuFavorit");
+
+                        selectedBooks.push(item);
+
+                        tempatBukuFavoritDiv.innerHTML += `
+                        <div>
+                            <img src="${item.image_url_medium}">
+                            <p>${item.title}</p>
+                        </div>`;
+
+                        jsonInput.value = JSON.stringify(selectedBooks);
+
+                        inputField.value = "";
+                        field.innerHTML = "";
                     });
 
-                    field.appendChild(li);
+                    field.appendChild(btn);
                 });
             } catch (error) {
                 console.error("Error:", error);
             }
         }
-    
-        const titleInput = document.getElementById("title-input");
-    
-        titleInput.addEventListener("input", rebuildAutoCompletionList); // Event listener for input event
-    
-        titleInput.addEventListener("blur", () => {
-            document.getElementById("dropdown_field").innerHTML = "";
-        });
-    </script>
-    
 
+        async function clearFavoriteBooks() {
+            const tempatBukuFavoritDiv = document.getElementById("tempatBukuFavorit");
+            selectedBooks.length = 0; // Clear the selectedBooks array
+
+            tempatBukuFavoritDiv.innerHTML = "";
+            jsonInput.value = "";
+        }
+
+        async function addFavoriteBooks() {
+            const form = document.getElementById("favoriteBookForm");
+            const formData = new FormData(form);
+
+            fetch(addFavoriteBookURL, {
+                method: "POST",
+                body: formData,
+            })
+                .then((response) => response.json())
+                .then(() => {
+                    clearFavoriteBooks();
+                    refreshFavoriteBooks();
+                });
+
+            form.reset();
+            return false;
+        }
+
+        async function getFavoriteBook() {
+            return fetch(getFavoriteBookURL).then((response) => response.json());
+        }
+
+        async function refreshFavoriteBooks() {
+            const data = await getFavoriteBook();
+            const favoriteBooksDiv = document.getElementById("favoriteBooks");
+            favoriteBooksDiv.innerHTML = "";
+            if (data.favorite_book) {
+                const favoriteBookData = JSON.parse(data.favorite_book);
+
+                if (!Array.isArray(favoriteBookData)) {
+                    favoriteBookData = [favoriteBookData];
+                }
+
+                let html = "";
+
+                favoriteBookData.forEach((item) => {
+                    html += `
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="${item.image_url_large}" class="card-img-top" alt="${item.title}" height="200px" width="200px">
+                            <div class="card-body">
+                                <p class="card-title text-small">${item.title}</p>
+                            </div>
+                            
+                        </div>
+                    </div>`;
+                });
+
+                favoriteBooksDiv.innerHTML = html;
+            }
+        }
+
+        refreshFavoriteBooks();
+
+        const titleInput = document.getElementById("title-input");
+        titleInput.addEventListener("input", rebuildAutoCompletionList);
+        const inputField = document.getElementById("title-input");
+        const field = document.getElementById("dropdown_field");
+
+        document.getElementById("button_close").onclick = clearFavoriteBooks;
+        document.getElementById("button_clear").onclick = clearFavoriteBooks;
+        document.getElementById("button_add").onclick = addFavoriteBooks;
+    </script>
 {% endblock content %}

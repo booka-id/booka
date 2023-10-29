@@ -77,7 +77,6 @@ Pada proyek ini, kami menggunakan [Book Recommendation Dataset](https://www.kagg
    - Memberikan ulasan kepada buku baik dalam bentuk rating maupun komentar
    - Melakukan kostumisasi profil yang menampilkan informasi mengenai pengguna
 
-
 2. Admin:
    - Menambahkan, menghapus, mengubah kapasitas buku cetak yang ditampilkan di aplikasi book katalog
    - Menambahkan event baru dan menghapus event yang telah berlalu

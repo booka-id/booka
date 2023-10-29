@@ -1,21 +1,130 @@
 {% extends 'base.html' %}
-
+{% load static %}
+{% block meta %}
+<style>
+    .wrapper{
+        width: 100%;
+        background: rgb(13,110,253);
+    }
+    .container-white{
+        background-color: white;
+        border-radius: 2rem 2rem 18rem 2rem;
+    }
+    .wordings{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 50vh;
+    }
+    img{
+        width: 500px;
+        height: 500px;
+        object-fit: cover;
+    }
+    .img-wrap{
+        display: flex;
+        justify-content: center;
+    }
+    .features{
+        text-align: center;
+        color: black;
+    }
+    .cards{
+        width: 70%;
+        padding: 2rem;
+        margin: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+    @media screen and (max-width: 800px) {
+        img {
+            display: none;
+        }
+        .container-white{
+        background-color: white;
+        border-radius: 2rem;
+    }
+    }
+</style>
+{% endblock meta %}
 {% block content %}
-    <H1>Booka</H1>
-    <ul>
-        <h2>{{user}}</h2>
-        <button>Book Catalogue</button>
-        <a href="{% url 'event:show_event' %}"><button>Book Event</button></a>
-
-        <button>Book Review</button>
-        <a href="{% url 'user_profile:show_profile' %}"><button>Profile</button></a>
-        
-    </ul>
-
-    {% if user !=  'guest'%}
-        <a href="{% url 'home:logout' %}"><button>Logout</button></a>
-    {% else %}
-        <a href="{% url 'home:login' %}"><button>Login</button></a>
-    {% endif %}
-
+<div class="wrapper p-5">
+    <div class="container-white p-5 d-flex">
+        <div class="wordings w-50">
+            <h1 style="font-weight: 900;">Improve your reading experience, Get into your own world with 
+                <span style="color: #0d6efd;">Booka</span></h1>
+        </div>
+        <div class="img-wrap w-50">
+            <img src="{% static 'img/hero.png' %}" alt="">
+        </div>
+    </div>
+</div>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#0d6efd" fill-opacity="1" d="M0,96L60,106.7C120,117,240,139,360,128C480,117,600,75,720,53.3C840,32,960,32,1080,58.7C1200,85,1320,139,1380,165.3L1440,192L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path></svg>
+<div class="features">
+    <h1 style="font-weight: 900;">What do we do?</h1>
+    <div class="cards">
+        <!-- CATALOGUE -->
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title text-bold" style="border-bottom: 2px solid #0d6efd; padding: 1rem;">
+                <i class="fa-solid fa-book"></i>   Book Catalogue</h5>
+              <p class="card-text">Bayangkan Anda memiliki perpustakaan pribadi yang tak terbatas, tetapi berada di ujung jari Anda. Dengan Book Catalogue, Anda dapat menjelajahi ribuan buku dari berbagai genre dan penulis.
+              </p>
+              <a class="icon-link icon-link-hover" href="#">
+                Explore <i class="fa-solid fa-arrow-right"></i>
+                <svg class="bi" aria-hidden="true"><use xlink:href="#arrow-right"></use></svg>
+              </a>
+            </div>
+        </div>
+        <!-- EVENTS -->
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title text-bold" style="border-bottom: 2px solid #0d6efd; padding: 1rem;">
+                <i class="fa-solid fa-shop"></i>   Book Events</h5>
+              <p class="card-text">Booka tak hanya tentang halaman buku, tetapi juga tentang acara dan kegiatan yang berkaitan dengan dunia literasi. Ikuti acara penulis kesukaan Anda, bergabung dengan kelompok diskusi buku yang seru, dan daftarkan diri Anda pada acara-acara menarik lainnya dengan fitur Book Event.
+              </p>
+              <a class="icon-link icon-link-hover" href="#">
+                Explore <i class="fa-solid fa-arrow-right"></i>
+                <svg class="bi" aria-hidden="true"><use xlink:href="#arrow-right"></use></svg>
+              </a>
+            </div>
+        </div>
+        <!-- REVIEW -->
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title text-bold" style="border-bottom: 2px solid #0d6efd; padding: 1rem;">
+                <i class="fa-solid fa-comments"></i>   Book Review</h5>
+              <p class="card-text">Terkadang, memilih buku bacaan dapat menjadi sebuah tantangan. Itu sebabnya, Book Review hadir untuk membantu Anda dengan menghadirkan ulasan dan rekomendasi dari pembaca lain. Bagikan pandangan Anda atau temukan pandangan yang cocok dengan selera Anda. Dalam Booka, dunia buku akan terasa lebih dekat dan terhubung.
+              </p>
+              <a class="icon-link icon-link-hover" href="#">
+                Explore <i class="fa-solid fa-arrow-right"></i>
+                <svg class="bi" aria-hidden="true"><use xlink:href="#arrow-right"></use></svg>
+              </a>
+            </div>
+        </div>
+        <!-- CATALOGUE -->
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title text-bold" style="border-bottom: 2px solid #0d6efd; padding: 1rem;">
+                <i class="fa-solid fa-user"></i>   Reading Profile</h5>
+              <p class="card-text">Di dalam Booka, Anda bukan sekadar seorang pembaca, melainkan pribadi yang menciptakan cerita literasi sendiri. Dengan Reading Profile, Anda dapat membangun profil pribadi Anda. Catat buku-buku yang telah Anda baca dan buat daftar buku yang ingin Anda tambahkan ke wishlist.
+              </p>
+              <a class="icon-link icon-link-hover" href="#">
+                Explore <i class="fa-solid fa-arrow-right"></i>
+                <svg class="bi" aria-hidden="true"><use xlink:href="#arrow-right"></use></svg>
+              </a>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        if('{{user}}'=='guest'){
+            document.querySelector('.dropdown').innerHTML = `<a href="{% url 'home:login' %}" type="button" class="btn btn-outline-light">Login</a>
+`
+        }else{
+            document.querySelector('.name').innerHTML = '{{user}}'
+        }
+    </script>
 {% endblock content %}

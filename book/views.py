@@ -20,7 +20,7 @@ def get_books_by_title(request):
             title = data.get('title', '')  # Extract the 'title' parameter
 
             # Perform your query based on 'title'
-            data = Book.objects.filter(title__icontains=title)[:5]
+            data = Book.objects.filter(title__icontains=title)[:10]
 
             return JsonResponse(list(data.values()), safe=False, content_type="application/json")
         except Exception as e:

@@ -1,0 +1,64 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+<h1>Write your review, {{user.username}}</h1>
+
+<div class="book-details">
+    <img src="{{book.image_url_large}}" alt="">
+    <h3>{{book.title}}</h3>
+    <p>Written by {{book.author}}</p>
+</div>
+
+<div class="review-form">
+    <h2>Write your review</h2>
+    <form id="form" method="POST">
+        {% csrf_token %}
+        <div class="form-input">
+            <label for="rating">Rating</label>
+            <input type="range" name="rating" min="0" max="5">
+        </div>
+        <div class="form-input">
+            <label for="title">Title</label>
+            <input type="text" name="title">
+        </div>
+        <div class="form-input">
+            <label for="content">Comment</label>
+            <textarea name="content" style="resize: none;"></textarea>
+        </div>
+        <a href="/review/{{book.pk}}"><button type="submit" onclick="postReview()">Post Review</button></a>
+    </form>
+</div>
+<button><a href="/review/{{book.pk}}">Back</a></button>
+
+<script>
+    function postReview() {
+        let url = "/review/post/" + '{{book.pk}}'
+        fetch(url, {
+            method: "POST",
+            body: new FormData(document.querySelector('#form'))
+        })
+        .then(response => {
+        if (response.ok) {
+            // The POST request was successful, and a redirect is expected.
+            // You don't need to do anything here; the browser should handle the redirect.
+        } else {
+            // Handle any errors or other responses here.
+            console.error("Failed to post the review.");
+        }
+    })
+        document.getElementById("form").reset()
+    }
+</script>
+{% endblock %}
+
+
+<!-- // reviews.forEach( review => {
+    //     let userId = review.fields.user
+    //     let user = getUser(userId)
+    //     console.log(user)
+    //     htmlString += `<div class="review-card">
+    //             <h3>Review by ${user.first_name}</h3>
+    //             <p>Rated ${review.fields.rating}/5</p>
+    //             <p>${review.fields.content}</p>
+    //     </div>`
+    // }) -->
