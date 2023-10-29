@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Katalog Buku</h1>
+    <a href="{% url 'catalogue:add_book' %}">Tambah Buku</a>
+    <ul>
+        {% for book in books %}
+            <li>
+                <h2>{{ book.title }}</h2>
+                <p>Penulis: {{ book.author }}</p>
+                <p>Tahun Terbit: {{ book.year }}</p>
+                <p>Penerbit: {{ book.publisher }}</p>
+                <img src="{{ book.image_url_large }}" alt="{{ book.title }} Image">
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock content %}

@@ -4,7 +4,7 @@
     <H1>Booka</H1>
     <ul>
         <h2>{{user}}</h2>
-        <button>Book Catalogue</button>
+        <a href="{% url 'catalogue:show_catalogue' %}"><button>Book Catalogue</button></a>
         <button>Book Event</button>
         <button>Book Review</button>
         <a href="{% url 'user_profile:show_profile' %}"><button>Profile</button></a>
