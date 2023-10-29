@@ -1,20 +1,136 @@
 {% extends 'base.html' %} 
 
+{% block meta %}
+<title>
+    {{book.title}}
+</title>
+<style>
+    .container{
+        border: 1px solid gray;
+        border-radius: 2rem;
+        justify-content: space-evenly;
+        position: relative;
+    }
+
+    .reviews-side{
+        width: 60%;
+        padding-left: 2rem;
+        border-left: 2px solid gray;
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+    }
+
+    #back{
+        position: absolute;
+        top: 2rem;
+        right: 3rem;
+    }
+
+    form{
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .reviews{
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 1.5rem;
+    }
+
+    .form-input{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .review-card{
+        display: flex;
+        border: 1px solid gray;
+        border-radius: 2rem;
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .review-detail{
+        padding: 0 1rem;
+        width: 90%;
+    }
+
+    .review-title{
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        justify-content: center;
+        max-width: 80%;
+    }
+    .review-title p{
+        margin: 0;
+    }
+
+    .review-header{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .review-header button{
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+    }
+    .review-card img{
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+</style>
+{% endblock meta%}
 {% block content %}
 
-<div class="book-details">
-    <img src="{{book.image_url_large}}" alt="">
-    <h3>{{book.title}}</h3>
-    <p>Written by {{book.author}}</p>
-</div>
-
-<button><a href='/review/write/{{book.id}}'>Rate this book</a></button>
-<button><a href='{% url "review:get_reviews" %}'>Back</a></button>
-
-<h2>REVIEWS</h2>
-<hr>
-<div class="reviews">
-
+<div class="container d-flex p-5 my-5">
+    <a id="back" class="btn btn-outline-danger" href='{% url "review:get_reviews" %}' role="button"> 
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+            <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+          </svg> Back</a>
+    <div class="book-details">
+        <div class="book-identity d-flex-column p-2">
+            <img src="{{book.image_url_large}}" alt="">
+            <h3>{{book.title}}</h3>
+            <p>{{book.year}}, Written by {{book.author}}</p>
+        </div>
+    </div>
+    <div class="reviews-side">
+        <div class="review-form">
+            <h2>What do you think about this book?</h2>
+            <form id="form" method="POST">
+                {% csrf_token %}
+                <div class="form-input">
+                    <label for="rating">Rating</label>
+                    <input type="range" name="rating" min="0" max="5">
+                </div>
+                <div class="form-floating">
+                    <input type="text" class="form-control" name="title" id="title" placeholder="title">
+                    <label for="title">Review title</label>
+                  </div>
+                <div class="form-floating">
+                    <textarea class="form-control" name="content" placeholder="Leave a comment here" id="content" style="height: 100px"></textarea>
+                    <label for="content">Comments</label>
+                </div>
+                <button type="button" onclick="postReview()" class="btn btn-outline-primary">Post Review</button>
+            </form>
+        </div>
+        
+        <div class="reviews-wrap">
+            <h3><b>Reviews</b></h2>
+            <hr>
+            <div class="reviews">
+            </div>
+        </div>
+        
+    </div>
 </div>
 <script>
     async function getReviews(){
@@ -31,23 +147,27 @@
         for(const review of reviews){
             let userId = review.fields.user
             let user = await getUser(userId)
-            htmlString += `<div class="review-card">
-            <h3>Review by ${user[0].fields.username}`
-            
-            if(user[0].fields.is_superuser == true){
-                htmlString += `<sub style="color:red;">(admin)</sub>`
-            }
-
-            htmlString+=`</h3>
-            <p>Rated ${review.fields.rating}/5</p>
-            <p>${review.fields.content}</p>
-            </div>`
-            if('{{user.pk}}' == userId || isAdmin){
-                htmlString +=
-                `<button onclick=deleteReview(${review.pk})>
-                    Delete this review
-                </button>`
-            }
+            htmlString += `
+                <div class="review-card">
+                    <div class="img-wrap">
+                        <img src="../media/${user[0].fields.profile_pic}"></img>
+                    </div>
+                    <div class="review-detail">
+                        <div class="review-header">
+                            <div class="review-title">
+                                <p>Review by <b>${user[0].fields.username}</b>`
+                                    if(user[0].fields.is_superuser){htmlString+=' 🔑'}
+                                    htmlString+=`</p>
+                            </div>`
+                            if(isAdmin){htmlString+=`<button onclick=deleteReview(${review.pk})>
+                                🗑️
+                            </button>`}
+                        htmlString+=`</div>
+                        <p>⭐ ${review.fields.rating}/5</p>
+                        <p style="font-size:20px;font-weight:700;margin:0px">${review.fields.title}</p>
+                        <p>${review.fields.content}</p>
+                    </div>
+                </div>`
         }
         content.innerHTML = htmlString
     }
@@ -65,9 +185,7 @@
             method: "POST",
             body: new FormData(document.querySelector('#form'))
         }).then(refreshReviews)
-
         document.getElementById("form").reset()
-        return false
     }
 
     function deleteReview(id){

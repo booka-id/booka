@@ -37,6 +37,15 @@
             method: "POST",
             body: new FormData(document.querySelector('#form'))
         })
+        .then(response => {
+        if (response.ok) {
+            // The POST request was successful, and a redirect is expected.
+            // You don't need to do anything here; the browser should handle the redirect.
+        } else {
+            // Handle any errors or other responses here.
+            console.error("Failed to post the review.");
+        }
+    })
         document.getElementById("form").reset()
     }
 </script>
