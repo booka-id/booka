@@ -28,4 +28,4 @@ urlpatterns = [
     path('review/', include('review.urls')),
     path("api/books/", include("book.urls")),
     path('', include('django.contrib.auth.urls')),
-] 
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

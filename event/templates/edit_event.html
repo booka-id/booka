@@ -7,6 +7,10 @@
         {% csrf_token %}
         <input type="hidden" name="event_id" value="{{ event.id }}">
         <div class="mb-3">
+            <label for="featured-book" class="col-form-label">Featured Book:</label>
+            <select class="form-select" id="featured-book" name="featured-book"></select>
+        </div>
+        <div class="mb-3">
             <label for="name" class="col-form-label">Name:</label>
             <input type="text" class="form-control" id="name" name="name" value="{{ event.name }}">
         </div>
@@ -32,6 +36,7 @@
 
         document.getElementById("button_save").addEventListener("click", function () {
             const formData = new FormData(editForm);
+            formData.append('event_id', '{{ event.id }}')
             fetch(`{% url 'event:edit_event' %}`, {
                 method: "POST",
                 body: formData,
@@ -43,5 +48,25 @@
                 });
         });
     });
+
+    async function featuredBook() {
+        var books = await getBooks()
+        var featuredBook = document.getElementById("featured-book")
+
+        let htmlString = '<option value = None> None </option>'
+
+        books.forEach((book) => {
+            htmlString += `
+                <option value ='${book.fields.title}'> ${book.fields.title} </option>
+            `
+        })
+        featuredBook.innerHTML=htmlString
+        featuredBook.value="{{ event.featured_book }}"
+    }
+    featuredBook()
+    
+    function getBooks() {
+        return fetch("{% url 'event:get_books' %}").then((res) => res.json())
+    }
 </script>
 {% endblock content %}

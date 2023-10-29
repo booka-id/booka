@@ -1,11 +1,14 @@
 from django.shortcuts import render
 from event.models import Event
+from book.models import Book
 from event.forms import EventForm
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url='/login')
 def show_event(request):
     events = Event.objects.all()
 
@@ -20,6 +23,11 @@ def get_event_json(request):
     event_item = Event.objects.all()
     return HttpResponse(serializers.serialize('json', event_item))
 
+def get_books(request):
+    books = Book.objects.all()
+
+    return HttpResponse(serializers.serialize('json', books))
+
 def edit_event(request, id=None):
     if (id==None):
         id = request.POST.get('event_id')
@@ -30,7 +38,9 @@ def edit_event(request, id=None):
 
     if form.is_valid() and request.method == "POST":
         form.save()
-        return HttpResponseRedirect(reverse("event:show_event"))
+        event.featured_book=request.POST.get("featured-book")
+        event.save()
+        return HttpResponseRedirect(reverse('/show_event'))
 
     context = {'form': form, 'event':event}
     return render(request, "edit_event.html", context)
@@ -42,8 +52,10 @@ def create_event(request):
         name = request.POST.get("name")
         date = request.POST.get("date")
         description = request.POST.get("description")
+        photo = request.POST.get("photo")
+        featured_book = request.POST.get("featured-book")
 
-        new_event = Event(name=name, date=date, description=description)
+        new_event = Event(name=name, date=date, description=description, photo=photo, featured_book=featured_book)
         new_event.save()
 
         return HttpResponse(b"CREATED", status=201)

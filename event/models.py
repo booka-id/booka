@@ -5,3 +5,4 @@ class Event(models.Model):
     date = models.DateTimeField()
     description = models.TextField()
     photo = models.URLField(default='https://www.pngkey.com/png/detail/233-2332677_ega-png.png')
+    featured_book = models.CharField(max_length=255)
