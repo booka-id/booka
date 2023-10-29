@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <img src="{{ book.book.image_url_large }}" alt="{{ book.book.title }} Image">
+    <h1>{{ book.book.title }}</h1>
+    <p>Penulis: {{ book.book.author }}</p>
+    <p>Tahun Terbit: {{ book.book.year }}</p>
+    <p>Penerbit: {{ book.book.publisher }}</p>
+    <p>ISBN: {{ book.book.isbn }}</p>
+    <p>Stok : {{ book.quantity }}</p>
+    <p>Harga : Rp{{ book.price }} </p>
+    <form action="{% url 'catalogue:buy_book' book.pk %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Beli</button>
+    </form>
+{% endblock %}

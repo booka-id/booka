@@ -31,7 +31,7 @@
         color: black;
     }
     .cards{
-        width: 70%;
+        width: 75%;
         padding: 2rem;
         margin: auto;
         display: flex;
@@ -85,7 +85,7 @@
                 <i class="fa-solid fa-shop"></i>   Book Events</h5>
               <p class="card-text">Booka tak hanya tentang halaman buku, tetapi juga tentang acara dan kegiatan yang berkaitan dengan dunia literasi. Ikuti acara penulis kesukaan Anda, bergabung dengan kelompok diskusi buku yang seru, dan daftarkan diri Anda pada acara-acara menarik lainnya dengan fitur Book Event.
               </p>
-              <a class="icon-link icon-link-hover" href="#">
+              <a class="icon-link icon-link-hover" href="{% url 'event:show_event'%}">
                 Explore <i class="fa-solid fa-arrow-right"></i>
                 <svg class="bi" aria-hidden="true"><use xlink:href="#arrow-right"></use></svg>
               </a>
@@ -98,7 +98,7 @@
                 <i class="fa-solid fa-comments"></i>   Book Review</h5>
               <p class="card-text">Terkadang, memilih buku bacaan dapat menjadi sebuah tantangan. Itu sebabnya, Book Review hadir untuk membantu Anda dengan menghadirkan ulasan dan rekomendasi dari pembaca lain. Bagikan pandangan Anda atau temukan pandangan yang cocok dengan selera Anda. Dalam Booka, dunia buku akan terasa lebih dekat dan terhubung.
               </p>
-              <a class="icon-link icon-link-hover" href="#">
+              <a class="icon-link icon-link-hover" href="{% url 'review:get_reviews' %}">
                 Explore <i class="fa-solid fa-arrow-right"></i>
                 <svg class="bi" aria-hidden="true"><use xlink:href="#arrow-right"></use></svg>
               </a>

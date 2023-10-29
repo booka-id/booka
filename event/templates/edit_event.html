@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    html {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .container {
+        margin-top: 30px;
+    }
+
+    h1.center-text {
+        text-align: center;
+    }
+
+    form {
+        background-color: #f7f7f7;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 4px 2px 8px #DDDDDD;
+        border: 0.3px;
+        margin-bottom: 1rem; 
+    }
+
+    .mb-3 {
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .title {
+        font-weight: bold;
+    }
+
+</style>
+
+<div class="container">
+    <h1 class="center-text">Edit Event</h1>
+    <form id="edit-form">
+        {% csrf_token %}
+        <input type="hidden" name="event_id" value="{{ event.id }}">
+        <div class="mb-3">
+            <label for="featured-book" class="col-form-label">Featured Book:</label>
+            <select class="form-select" id="featured-book" name="featured-book"></select>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="col-form-label">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ event.name }}">
+        </div>
+        <div class="mb-3">
+            <label for="date" class="col-form-label">Date and Time:</label>
+            <input type="datetime-local" class="form-control" id="date" name="date" value="{{ event.date|date:'Y-m-d\TH:i' }}">
+        </div>
+        <div class="mb-3">
+            <label for="description" class="col-form-label">Description:</label>
+            <textarea class="form-control" id="description" name="description">{{ event.description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="photo" class="col-form-label">Photo URL:</label>
+            <input type="url" class="form-control" id="photo" name="photo" value="{{ event.photo }}">
+        </div>
+        <button type="button" class="btn btn-primary" id="button_save">Save Changes</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editForm = document.getElementById("edit-form");
+
+        document.getElementById("button_save").addEventListener("click", function () {
+            const formData = new FormData(editForm);
+            formData.append('event_id', '{{ event.id }}')
+            fetch(`{% url 'event:edit_event' %}`, {
+                method: "POST",
+                body: formData,
+            })
+            .then((response) => {
+                if (response.status === 200) {
+                    alert("Event edited successfully");
+                }
+            });
+        });
+    });
+
+    async function featuredBook() {
+        var books = await getBooks();
+        var featuredBook = document.getElementById("featured-book");
+
+        let htmlString = '<option value="None">None</option>';
+
+        books.forEach((book) => {
+            htmlString += `
+                <option value='${book.fields.title}'>${book.fields.title}</option>
+            `;
+        });
+        featuredBook.innerHTML = htmlString;
+        featuredBook.value = "{{ event.featured_book }}";
+    }
+    featuredBook();
+
+    function getBooks() {
+        return fetch("{% url 'event:get_books' %}").then((res) => res.json());
+    }
+</script>
+{% endblock content %}
