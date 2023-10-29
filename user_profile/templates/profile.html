@@ -16,12 +16,12 @@
         <li>{{user.email}}</li>
         <li>{{user.bio}}</li>
         <li>
-            <div id="favoriteBooks"></div>
+
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Change Favorite Book</button>
         </li>
            </ul>
 <div class="container">
-    <div class="row"></div>
+    <div class="row row-cols-1 row-cols-md-6 g-8" id="favoriteBooks"></div>
 </div>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -185,10 +185,15 @@
 
                 favoriteBookData.forEach((item) => {
                     html += `
-                        <div>
-                            <img src="${item.image_url_medium}" alt="${item.title}">
-                            <p>${item.title}</p>
-                        </div>`;
+                    <div class="col">
+                        <div class="card h-100">
+                            <img src="${item.image_url_large}" class="card-img-top" alt="${item.title}" height="200px" width="200px">
+                            <div class="card-body">
+                                <p class="card-title text-small">${item.title}</p>
+                            </div>
+                            
+                        </div>
+                    </div>`;
                 });
 
                 favoriteBooksDiv.innerHTML = html;
