@@ -3,6 +3,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages  
+import datetime
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 def show_home(request):  
     if request.user.is_authenticated:
@@ -22,7 +25,9 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home:show_home')
+            response = HttpResponseRedirect(reverse("home:show_home")) 
+            response.set_cookie('last_login', str(datetime.datetime.now()))
+            return response
         else:
             messages.info(request, 'Sorry, incorrect username or password. Please try again.')
     context = {}
@@ -44,7 +49,9 @@ def register_user(request):
 
 def logout_user(request):
     logout(request)
-    return redirect('home:login')
+    response = HttpResponseRedirect(reverse('home:show_home'))
+    response.delete_cookie('last_login')
+    return response
 
 
 # Create your views here.
