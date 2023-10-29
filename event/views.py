@@ -40,7 +40,7 @@ def edit_event(request, id=None):
         form.save()
         event.featured_book=request.POST.get("featured-book")
         event.save()
-        return HttpResponseRedirect(reverse('/show_event'))
+        return HttpResponseRedirect(reverse('event:show_event'))
 
     context = {'form': form, 'event':event}
     return render(request, "edit_event.html", context)
