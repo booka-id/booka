@@ -64,6 +64,10 @@ def get_reviews_by_user(request,user_id):
     reviews = Review.objects.filter(user=user_id)
     return HttpResponse(serializers.serialize('json', reviews), content_type="application/json")
 
+def get_one_review(request, review_id):
+    review = Review.objects.filter(pk=review_id)
+    return HttpResponse(serializers.serialize('json', review), content_type="application/json")
+
 def get_user(request, id):
     user = User.objects.filter(pk=id)
     return HttpResponse(serializers.serialize('json', user), content_type="application/json")
