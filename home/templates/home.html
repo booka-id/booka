@@ -13,6 +13,8 @@
 
     {% if user !=  'guest'%}
         <a href="{% url 'home:logout' %}"><button>Logout</button></a>
+    {% else %}
+        <a href="{% url 'home:login' %}"><button>Login</button></a>
     {% endif %}
 
 {% endblock content %}
