@@ -6,6 +6,9 @@
 </title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <style>
+    :root{
+        --primary: #0d6efd;
+    }
     .books{
         display: flex;
         justify-content: center;
@@ -55,7 +58,7 @@
 
     .review-card{
         display: flex;
-        border: 1px solid gray;
+        border: 1px solid var(--primary);
         border-radius: 2rem;
         justify-content: center;
         padding: 1rem;
@@ -106,10 +109,16 @@
     }
 
     .ranks{
-        margin-top: 3rem;
+        margin: 3rem 0;
         padding: 1rem;
-        border: 1px solid gray;
+        border: 2px solid var(--primary);
         border-radius: 2rem;
+        position: sticky;
+        top: 7rem;
+    }
+    .modal-body{
+        display: flex;
+        justify-content: center;
     }
     /* #pills-feeds{
         display: flex;
@@ -126,7 +135,26 @@
 {% endblock meta %}
 
 {% block content%}
+<!-- MODAL -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure to delete this review?</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="button_delete" data-bs-dismiss="modal">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- CONTENT -->
 <div class="container-lg mt-5" style="display: flex;justify-content: center;">
     <div class="contents" style="width: 75%;">
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -271,6 +299,10 @@
         let url = "/review/get_reviews/" + id
         return fetch(url).then( res => res.json())
     }
+    async function getReview(id){
+        let url = "/review/get_review/" + id
+        return fetch(url).then( res => res.json())
+    }
     function deleteReview(id){
         let url = "/review/delete/" + id
         fetch(url, {method:"DELETE"}).then(refreshReviews)
@@ -334,16 +366,16 @@
                     <div class="review-detail">
                         <div class="review-header">
                             <div class="review-title">
-                                <p>Review by <b>${user[0].fields.username}`
+                                <p>Review by <b>${user[0].fields.username}</b>`
                                     if(user[0].fields.is_superuser){htmlString+=' 🔑'}
-                                    htmlString+=`</b></p>
-                                <p>on ${book[0].fields.title}</p>
+                                    htmlString+=`</p>
                             </div>`
                             if(isAdmin){htmlString+=`
-                                <a  class="btn btn-outline-danger" onclick=deleteReview(${review.pk}) role="button">
-                            <i class="fa-solid fa-trash"></i></a>`}
+                                <a data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-outline-danger" onclick=fillModal(${review.pk}) role="button">
+                                    <i class="fa-solid fa-trash"></i></a>`}
                         htmlString+=`</div>
                         <p>⭐ <b>${review.fields.rating}/5</b></p>
+                        <p style="font-size:20px;font-weight:700;margin:0px">${review.fields.title}</p>
                         <p>${review.fields.content}</p>
                     </div>
                 </div>`
@@ -370,16 +402,16 @@
                     <div class="review-detail">
                         <div class="review-header">
                             <div class="review-title">
-                                <p>Review by <b>${user[0].fields.username}`
+                                <p>Review by <b>${user[0].fields.username}</b>`
                                     if(user[0].fields.is_superuser){htmlString+=' 🔑'}
-                                    htmlString+=`</b></p>
-                                <p>on ${book[0].fields.title}</p>
+                                    htmlString+=`</p>
                             </div>`
                             if(isAdmin){htmlString+=`
-                                <a  class="btn btn-outline-danger" onclick=deleteReview(${review.pk}) role="button">
-                            <i class="fa-solid fa-trash"></i></a>`}
-                htmlString+=`</div>
+                                <a data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-outline-danger" onclick=fillModal(${review.pk}) role="button">
+                                    <i class="fa-solid fa-trash"></i></a>`}
+                        htmlString+=`</div>
                         <p>⭐ <b>${review.fields.rating}/5</b></p>
+                        <p style="font-size:20px;font-weight:700;margin:0px">${review.fields.title}</p>
                         <p>${review.fields.content}</p>
                     </div>
                 </div>`
@@ -387,8 +419,11 @@
             content.innerHTML = htmlString
         }else{
             content.innerHTML = `
+            <div style="text-align:center;margin-top:10rem;">
             <h1>Login to see this page!</h1>
-            <a href="{% url 'home:login' %}"><button>Login</button></a>`
+            <a class="btn btn-outline-primary" href="{% url 'home:login' %}" role="button">Login</a>
+
+            </div>`
         }
     }
     
@@ -428,6 +463,32 @@
                 }
                 content.innerHTML = htmlString
             }
+    }
+
+    async function fillModal(id){
+        let review = await getReview(id);
+        review = review[0]
+        let userId = review.fields.user
+        let user = await getUser(userId)
+        user = user[0]
+        document.querySelector('.modal-body').innerHTML =
+        `<div class="review-card">
+            <div class="img-wrap">
+                <img src="../media/${user.fields.profile_pic}"></img>
+            </div>
+            <div class="review-detail">
+                <div class="review-header">
+                    <div class="review-title">
+                        <p>Review by <b>${user.fields.username}</b></p>
+                    </div></div>
+                <p>⭐ <b>${review.fields.rating}/5</b></p>
+                <p style="font-size:20px;font-weight:700;margin:0px">${review.fields.title}</p>
+                <p>${review.fields.content}</p>
+            </div>
+        </div>`
+        document.querySelector('#button_delete').addEventListener('click', () =>{
+            deleteReview(id);
+        })
     }
 
     function roundToTwo(num) {
