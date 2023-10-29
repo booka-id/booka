@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'event',
     'review',
     'user_profile',
+    'book',
 ]
 
 MIDDLEWARE = [
