@@ -5,7 +5,8 @@
     <ul>
         <h2>{{user}}</h2>
         <button>Book Catalogue</button>
-        <button>Book Event</button>
+        <a href="{% url 'event:show_event' %}"><button>Book Event</button></a>
+
         <button>Book Review</button>
         <a href="{% url 'user_profile:show_profile' %}"><button>Profile</button></a>
         

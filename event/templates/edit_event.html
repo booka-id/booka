@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="center-text">Edit Event</h1>
+    <form id="edit-form">
+        {% csrf_token %}
+        <input type="hidden" name="event_id" value="{{ event.id }}">
+        <div class="mb-3">
+            <label for="name" class="col-form-label">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ event.name }}">
+        </div>
+        <div class="mb-3">
+            <label for="date" class="col-form-label">Date and Time:</label>
+            <input type="datetime-local" class="form-control" id="date" name="date" value="{{ event.date|date:'Y-m-d\TH:i' }}">
+        </div>
+        <div class="mb-3">
+            <label for="description" class="col-form-label">Description:</label>
+            <textarea class="form-control" id="description" name="description">{{ event.description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="photo" class="col-form-label">Photo URL:</label>
+            <input type="url" class="form-control" id="photo" name="photo" value="{{ event.photo }}">
+        </div>
+        <button type="button" class="btn btn-primary" id="button_save">Save Changes</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editForm = document.getElementById("edit-form");
+
+        document.getElementById("button_save").addEventListener("click", function () {
+            const formData = new FormData(editForm);
+            fetch(`{% url 'event:edit_event' %}`, {
+                method: "POST",
+                body: formData,
+            })
+                .then((response) => {
+                    if (response.status === 200) {
+                        alert("Event edited successfully");
+                    }
+                });
+        });
+    });
+</script>
+{% endblock content %}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registration</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <img src="{{ event.photo }}" alt="Event Photo" class="img-fluid">
+            </div>
+            <div class="col-md-8">
+                <h1>{{ event.name }}</h1>
+                <p>Date: {{ event.date }}</p>
+                <p>Description: {{ event.description }}</p>
+            </div>
+        </div>
+        <h2>Sign Up for This Event</h2>
+        <form action="/signup" method="post">
+            <div>
+                <label for="first-name">First Name:</label>
+                <input type="text" id="first-name" name="first_name" required>
+            </div>
+            <div>
+                <label for="last-name">Last Name:</label>
+                <input type="text" id="last-name" name="last_name" required>
+            </div>
+            <div>
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div>
+                <label for="birthday">Birthday:</label>
+                <input type="date" id="birthday" name="birthday" required>
+            </div>
+            <input type="hidden" name="event_id" value="{{ event.pk }}">
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</body>
+</html>
