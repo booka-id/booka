@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseRedirect,HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseRedirect,HttpResponseNotFound, JsonResponse
 from django.core import serializers
 from django.shortcuts import render
 from django.urls import reverse
@@ -9,7 +9,7 @@ from .models import Review
 from .forms import ReviewForm
 from django.views.decorators.csrf import csrf_exempt
 from urllib.parse import unquote
-from django.db.models import Count
+from django.db.models import Count, Avg
 
 
 # Create your views here.
@@ -79,8 +79,9 @@ def post_review(request, book_id):
             book=book,
         )
         new_review.save()
-        url = '/review/'+ str(book_id)
-        return HttpResponse()
+        url = reverse('review:see_review', args=[book_id])
+        print('halo',url)
+        return HttpResponseRedirect(url)
     
     return HttpResponseNotFound()
 
@@ -104,3 +105,8 @@ def get_books_by_id(request,book_id):
 def get_ranks(request):
     top_books = Book.objects.annotate(num_reviews=Count('review')).order_by('-num_reviews')[:10]
     return HttpResponse(serializers.serialize('json', top_books), content_type='application/json')
+
+def get_rating_ranks(request):
+    average_ratings = Book.objects.annotate(avg_rating=Avg('review__rating')).order_by('-avg_rating')[:10]
+    books_data = [{'title': book.title, 'author': book.author, 'avg_rating': book.avg_rating,'id':book.pk} for book in average_ratings]
+    return JsonResponse(books_data, safe=False)

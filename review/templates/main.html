@@ -141,6 +141,9 @@
     async function getRanks(){
         return fetch('{% url "review:get_ranks" %}').then(res => res.json())
     }
+    async function getRatingRanks(){
+        return fetch('{% url "review:get_rating_ranks" %}').then(res => res.json())
+    }
 
     async function getReviews(id){
         let url = "/review/get_reviews/" + id
@@ -280,9 +283,32 @@
             }
             content.innerHTML = htmlString
     }
+    async function showRatingRanks(){
+        let top_books = await getRatingRanks()
+        const content = document.querySelector('.ranks')
+        content.innerHTML = ""
+        let htmlString = `<h2>Hot Topics</h2>`;
+        for(let i=0;i<top_books.length; i++){
+            const book = top_books[i]
+            if(book.avg_rating!=null){
+                const reviews = await getReviews(book.id)
+                htmlString +=
+                `<div class="rankings-card">
+                    <h3>${i+1}. ${book.title}</h3>
+                    <p>by ${book.author}</p>
+                    <p style="color: blue;">${roundToTwo(book.avg_rating)}/5 | ${reviews.length} reviews</p>
+                    </div>`
+                }
+                content.innerHTML = htmlString
+            }
+    }
+
+    function roundToTwo(num) {
+        return +(Math.round(num + "e+2")  + "e-2");
+    }
     
     refreshBooks();
-    showRanks();
+    showRatingRanks();
     refreshReviews();
     refreshUserReviews();
 </script>
