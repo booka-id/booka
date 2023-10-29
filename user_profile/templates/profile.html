@@ -1,15 +1,100 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
     <H1>Booka</H1>
     <ul>
         <li>Welcome {{user.first_name}}</li>
         <li>
-            <img class="rounded-circle account-img" src="{{ user.profile_pic.url }}">
+            {% if user.profile_pic %}
+                <img class="rounded-circle account-img" src="{{ user.profile_pic.url }}" >
+            {% else %}
+                <img class="rounded-circle account-img" src="{% static 'userprofile/default.png' %}" width="200px" height="200px">
+            {% endif %}
         </li>
         <li>{{user.email}}</li>
         <li>{{user.bio}}</li>
     </ul>
-    <div></div>
+    <div>
+        <div class="dropdown">
+            <input
+                type="text"
+                class="form-control"
+                id="title-input"
+                placeholder="Type of book title"
+                autocomplete="off"
+                >
+                <ul class="dropdown-menucan" id="dropdown_field"><!-- Build dynamically --></ul>
+          </div>
+    </div>
+    
+    <div id="tempat buku favorit"></div>
+    <script>
+        const bookByTitleURL = "{% url 'book:book_by_title' %}";  // Replace 'book_by_title' with the actual URL name in your Django project
+        
+    
+        async function getProducts(search_term) {
+            const url = bookByTitleURL;
+            const payloadData = {
+                title: search_term,
+            };
+            const request = new Request(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+    
+                },
+                body: JSON.stringify(payloadData),
+            });
+            console.log(request.body)
+    
+            return fetch(request).then((res) => res.json());
+        }
+    
+        async function rebuildAutoCompletionList() {
+            const input_field = document.getElementById("title-input");
+            const search_term = input_field.value;
+            console.log(search_term);
+            const field = document.getElementById("dropdown_field");
+            
+            // Clear the dropdown when input is empty
+            if (!search_term) {
+                field.innerHTML = "";
+                return;
+            }
+
+            try {
+                const book = await getProducts(search_term);
+                console.log("Book data:", book);
+
+                field.innerHTML = "";
+
+                book.forEach((item) => {
+                    let li = document.createElement("li");
+                    let btn = document.createElement("button");
+                    btn.textContent = item.title; 
+                    li.innerHTML = btn
+
+                    btn.addEventListener("click", () => {
+                        // Populate "tempat buku favorit" div with the selected item's data
+                        const tempatBukuFavoritDiv = document.getElementById("test");
+                        tempatBukuFavoritDiv.innerHTML += JSON.stringify(item, null, 2);
+                    });
+
+                    field.appendChild(li);
+                });
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+    
+        const titleInput = document.getElementById("title-input");
+    
+        titleInput.addEventListener("input", rebuildAutoCompletionList); // Event listener for input event
+    
+        titleInput.addEventListener("blur", () => {
+            document.getElementById("dropdown_field").innerHTML = "";
+        });
+    </script>
+    
 
 {% endblock content %}
