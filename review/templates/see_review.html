@@ -4,7 +4,11 @@
 <title>
     {{book.title}}
 </title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <style>
+    :root{
+        --starred: rgb(226, 183, 42);
+    }
     .container{
         border: 1px solid gray;
         border-radius: 2rem;
@@ -85,6 +89,15 @@
         object-fit: cover;
         border-radius: 50%;
     }
+    .stars i{
+        color: rgb(214, 221, 227);
+        font-size: 2.3rem;
+        cursor: pointer;
+        transition: color 0.1s ease-in-out;
+    }
+    .stars i.starred{
+        color: var(--starred);
+    }
 </style>
 {% endblock meta%}
 {% block content %}
@@ -99,7 +112,24 @@
         <div class="book-identity d-flex-column p-2">
             <img src="{{book.image_url_large}}" alt="">
             <h3>{{book.title}}</h3>
-            <p>{{book.year}}, Written by {{book.author}}</p>
+            <table class="table table-striped-columns">
+                <tr>
+                    <td>ISBN</td>
+                    <td>{{book.isbn}}</td>
+                </tr>
+                <tr>
+                    <td>Author</td>
+                    <td>{{book.author}}</td>
+                </tr>
+                <tr>
+                    <td>Published Year</td>
+                    <td>{{book.year}}</td>
+                </tr>
+                <tr>
+                    <td>Rating</td>
+                    <td>⭐ {{ average_rating|floatformat:1 }}</td>
+                </tr>
+            </table>
         </div>
     </div>
     <div class="reviews-side">
@@ -107,9 +137,13 @@
             <h2>What do you think about this book?</h2>
             <form id="form" method="POST">
                 {% csrf_token %}
-                <div class="form-input">
-                    <label for="rating">Rating</label>
-                    <input type="range" name="rating" min="0" max="5">
+                <div class="stars">
+                    <p style="font-weight: 600; margin-bottom: 0px;">Rating</p>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
                 </div>
                 <div class="form-floating">
                     <input type="text" class="form-control" name="title" id="title" placeholder="title">
@@ -133,6 +167,25 @@
     </div>
 </div>
 <script>
+    if('{{user}}'=='AnonymousUser'){
+        document.querySelector('.dropdown').innerHTML = `<a href="{% url 'home:login' %}" type="button" class="btn btn-outline-light">Login</a>`
+    }else{
+        document.querySelector('.name').innerHTML = '{{user.first_name}}'
+    }
+    //STAR REVIEW FUNCTIONALITY
+    const stars = document.querySelectorAll('i');
+    stars.forEach((star,index1) => {
+        star.addEventListener('click', ()=>{
+            stars.forEach((star,index2) => {
+                if(index2<=index1){
+                    star.classList.add('starred');
+                }else{
+                    star.classList.remove('starred');
+                }
+            })
+        })
+    })
+
     async function getReviews(){
         let url = "/review/get_reviews/" + '{{book.pk}}'
         return fetch(url).then( res => res.json())
@@ -159,11 +212,11 @@
                                     if(user[0].fields.is_superuser){htmlString+=' 🔑'}
                                     htmlString+=`</p>
                             </div>`
-                            if(isAdmin){htmlString+=`<button onclick=deleteReview(${review.pk})>
-                                🗑️
-                            </button>`}
+                            if(isAdmin){htmlString+=`
+                                <a  class="btn btn-outline-danger" onclick=deleteReview(${review.pk}) role="button">
+                                    <i class="fa-solid fa-trash"></i></a>`}
                         htmlString+=`</div>
-                        <p>⭐ ${review.fields.rating}/5</p>
+                        <p>⭐ <b>${review.fields.rating}/5</b></p>
                         <p style="font-size:20px;font-weight:700;margin:0px">${review.fields.title}</p>
                         <p>${review.fields.content}</p>
                     </div>
@@ -181,11 +234,23 @@
     
     function postReview() {
         let url = "/review/post/" + '{{book.pk}}'
+        const rating = document.querySelectorAll('.starred').length;
+        const formData = new FormData(document.querySelector('#form'));
+        formData.append('rating', rating);
+        let payload = {
+            rating : document.querySelectorAll('.starred').length,
+            title : document.querySelector('#title').value,
+            content : document.querySelector('#content').value
+        }
         fetch(url, {
             method: "POST",
-            body: new FormData(document.querySelector('#form'))
+            body: formData
         }).then(refreshReviews)
+
         document.getElementById("form").reset()
+        stars.forEach( star => {
+            star.classList.remove('starred')
+        })
     }
 
     function deleteReview(id){

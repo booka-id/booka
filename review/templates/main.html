@@ -4,6 +4,7 @@
 <title>
     Review
 </title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <style>
     .books{
         display: flex;
@@ -59,6 +60,7 @@
         justify-content: center;
         padding: 1rem;
         width: 80%;
+        margin: 1rem 0;
     }
 
     .review-detail{
@@ -125,10 +127,7 @@
 
 {% block content%}
 
-<h1 class="text-bold">Books</h1> 
-<a href="/">home</a>
-
-<div class="container-lg" style="display: flex;justify-content: center;">
+<div class="container-lg mt-5" style="display: flex;justify-content: center;">
     <div class="contents" style="width: 75%;">
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -204,6 +203,11 @@
     //         }
     //     })
     // })
+    if('{{user}}'=='AnonymousUser'){
+        document.querySelector('.dropdown').innerHTML = `<a href="{% url 'home:login' %}" type="button" class="btn btn-outline-light">Login</a>`
+    }else{
+        document.querySelector('.name').innerHTML = '{{user.first_name}}'
+    }
 
     //ENTER KEY
     document.getElementById("book-search")
@@ -330,16 +334,16 @@
                     <div class="review-detail">
                         <div class="review-header">
                             <div class="review-title">
-                                <h5>Review by ${user[0].fields.username}`
+                                <p>Review by <b>${user[0].fields.username}`
                                     if(user[0].fields.is_superuser){htmlString+=' 🔑'}
-                                    htmlString+=`</h5>
+                                    htmlString+=`</b></p>
                                 <p>on ${book[0].fields.title}</p>
                             </div>`
-                            if(isAdmin){htmlString+=`<button onclick=deleteReview(${review.pk})>
-                                🗑️
-                            </button>`}
+                            if(isAdmin){htmlString+=`
+                                <a  class="btn btn-outline-danger" onclick=deleteReview(${review.pk}) role="button">
+                            <i class="fa-solid fa-trash"></i></a>`}
                         htmlString+=`</div>
-                        <p>⭐ ${review.fields.rating}/5</p>
+                        <p>⭐ <b>${review.fields.rating}/5</b></p>
                         <p>${review.fields.content}</p>
                     </div>
                 </div>`
@@ -366,17 +370,16 @@
                     <div class="review-detail">
                         <div class="review-header">
                             <div class="review-title">
-                                <h5>Review by ${user[0].fields.username}`
+                                <p>Review by <b>${user[0].fields.username}`
                                     if(user[0].fields.is_superuser){htmlString+=' 🔑'}
-                                    htmlString+=`</h5>
+                                    htmlString+=`</b></p>
                                 <p>on ${book[0].fields.title}</p>
                             </div>`
-                if(isAdmin)
-                {htmlString+=`<button onclick=deleteReview(${review.pk})>
-                    🗑️
-                </button>`}
+                            if(isAdmin){htmlString+=`
+                                <a  class="btn btn-outline-danger" onclick=deleteReview(${review.pk}) role="button">
+                            <i class="fa-solid fa-trash"></i></a>`}
                 htmlString+=`</div>
-                        <p>⭐ ${review.fields.rating}/5</p>
+                        <p>⭐ <b>${review.fields.rating}/5</b></p>
                         <p>${review.fields.content}</p>
                     </div>
                 </div>`
@@ -420,7 +423,7 @@
                 `<div class="rankings-card">
                     <h3>${i+1}. ${book.title}</h3>
                     <p>by ${book.author}</p>
-                    <p style="color: blue;">${roundToTwo(book.avg_rating)}/5 | ${reviews.length} reviews</p>
+                    <p style="color: blue;">⭐ <b>${roundToTwo(book.avg_rating)}/5</b> | ${reviews.length} reviews</p>
                     </div>`
                 }
                 content.innerHTML = htmlString

@@ -30,10 +30,15 @@ def get_reviews(request):
 
 def see_review(request, id):
     book = Book.objects.get(pk=id)
-        
+    # Calculate the average rating for the specific book
+    average_rating = Review.objects.filter(book_id=id).aggregate(Avg('rating'))
+
+    # The average rating is stored in the dictionary as 'rating__avg'
+    avg_rating_value = average_rating['rating__avg']
     context = {
         'book':book,
-        'user': request.user
+        'user': request.user,
+        'average_rating':avg_rating_value
     }
     return render(request, 'see_review.html', context)
 
@@ -63,8 +68,10 @@ def get_user(request, id):
     user = User.objects.filter(pk=id)
     return HttpResponse(serializers.serialize('json', user), content_type="application/json")
 
+@csrf_exempt
 def post_review(request, book_id):
     book = Book.objects.get(pk=book_id)
+    print(request.POST)
     if request.method == 'POST':
         title = request.POST.get("title")
         content = request.POST.get("content")
