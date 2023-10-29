@@ -1,0 +1,90 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+
+<div class="book-details">
+    <img src="{{book.image_url_large}}" alt="">
+    <h3>{{book.title}}</h3>
+    <p>Written by {{book.author}}</p>
+</div>
+
+<button><a href='/review/write/{{book.id}}'>Rate this book</a></button>
+<button><a href='{% url "review:get_reviews" %}'>Back</a></button>
+
+<h2>REVIEWS</h2>
+<hr>
+<div class="reviews">
+
+</div>
+<script>
+    async function getReviews(){
+        let url = "/review/get_reviews/" + '{{book.pk}}'
+        return fetch(url).then( res => res.json())
+    }
+
+    async function refreshReviews(){
+        const content = document.querySelector('.reviews')
+        content.innerHTML = ""
+        const reviews = await getReviews()
+        let htmlString = ``;
+        let isAdmin = '{{user.is_superuser}}'== 'True'
+        for(const review of reviews){
+            let userId = review.fields.user
+            let user = await getUser(userId)
+            htmlString += `<div class="review-card">
+            <h3>Review by ${user[0].fields.username}`
+            
+            if(user[0].fields.is_superuser == true){
+                htmlString += `<sub style="color:red;">(admin)</sub>`
+            }
+
+            htmlString+=`</h3>
+            <p>Rated ${review.fields.rating}/5</p>
+            <p>${review.fields.content}</p>
+            </div>`
+            if('{{user.pk}}' == userId || isAdmin){
+                htmlString +=
+                `<button onclick=deleteReview(${review.pk})>
+                    Delete this review
+                </button>`
+            }
+        }
+        content.innerHTML = htmlString
+    }
+    
+    refreshReviews();
+    
+    async function getUser(id){
+        let url = "/review/get_user/" + id
+        return fetch(url).then( res => res.json())
+    }
+    
+    function postReview() {
+        let url = "/review/post/" + '{{book.pk}}'
+        fetch(url, {
+            method: "POST",
+            body: new FormData(document.querySelector('#form'))
+        }).then(refreshReviews)
+
+        document.getElementById("form").reset()
+        return false
+    }
+
+    function deleteReview(id){
+        let url = "/review/delete/" + id
+        fetch(url, {method:"DELETE"}).then(refreshReviews)
+    }
+</script>
+{% endblock %}
+
+
+<!-- // reviews.forEach( review => {
+    //     let userId = review.fields.user
+    //     let user = getUser(userId)
+    //     console.log(user)
+    //     htmlString += `<div class="review-card">
+    //             <h3>Review by ${user.first_name}</h3>
+    //             <p>Rated ${review.fields.rating}/5</p>
+    //             <p>${review.fields.content}</p>
+    //     </div>`
+    // }) -->
