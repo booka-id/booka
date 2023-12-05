@@ -6,3 +6,4 @@ class BookStock(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
     price = models.PositiveIntegerField(default=0)
+    
