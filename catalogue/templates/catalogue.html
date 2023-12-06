@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% block meta %}
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"> -->
+<style>
+    .card {
+    display: flex;
+    flex-direction: column;
+    height: 450px; /* Contoh tinggi tetap */
+    }
+    .book-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%; /* Memastikan kartu mengisi tinggi kontainer */
+    }
+  
+    .book-card .card-body {
+      flex-grow: 1; /* Memastikan isi kartu mengisi ruang yang tersedia */
+      display: flex;
+      flex-direction: column;
+    }
+  
+    .book-card img {
+      height: 100px; /* Atur tinggi gambar */
+      width: 100px;
+      display: block;
+      object-fit: cover; /* Pastikan gambar menutupi area dengan proporsi yang benar */
+    }
+  
+    .card-title, .card-text {
+      font-size: 1rem; /* Ukuran font standar */
+    }
+  
+    .card-body > button {
+      margin-top: auto; /* Mendorong tombol ke bawah */
+    }
+</style>
+  
+{% endblock meta %}
+{% block content %}
+<div class="container mt-5">
+    <!-- Form Pencarian -->
+    <div class="row mb-3">
+        <div class="col">
+            <div class="input-group">
+                <input type="text" id="search-input" class="form-control" placeholder="Cari judul buku...">
+                <div class="input-group-append">
+                    <button onclick="searchBooks()" class="btn btn-primary">Cari</button>
+                    {% if request.user.is_superuser %}
+                        <button onclick="showAddBookModal()" class="btn btn-success">Tambah Buku</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Katalog Buku -->
+    <div class="row" id="book-catalogue">
+        <!-- Buku akan dimuat di sini menggunakan JavaScript -->
+    </div>
+</div>
+
+
+<!-- Modal Tambah Buku -->
+<div class="modal fade" id="addBookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Buku Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form untuk menambah buku -->
+                <form id="addBookForm" onsubmit="return false;">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="bookTitle" class="form-label">Judul</label>
+                        <input type="text" class="form-control" id="bookTitle" name="bookTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="bookISBN" class="form-label">ISBN</label>
+                        <input type="text" class="form-control" id="bookISBN" name="bookISBN" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="bookAuthor" class="form-label">Penulis</label>
+                        <input type="text" class="form-control" id="bookAuthor" name="bookAuthor" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="bookYear" class="form-label">Tahun</label>
+                        <input type="number" class="form-control" id="bookYear" name="bookYear" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="bookPublisher" class="form-label">Penerbit</label>
+                        <input type="text" class="form-control" id="bookPublisher" name="bookPublisher" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="bookImageURLLarge" class="form-label">URL Gambar Besar</label>
+                        <input type="url" class="form-control" id="bookImageURLLarge" name="bookImageURLLarge">
+                    </div>
+                    <div class="mb-3">
+                        <label for="bookQuantity" class="form-label">Jumlah</label>
+                        <input type="number" class="form-control" id="bookQuantity" name="bookQuantity" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="bookPrice" class="form-label">Harga</label>
+                        <input type="number" class="form-control" id="bookPrice" name="bookPrice" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Tambah</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Konfirmasi Hapus -->
+<div class="modal fade" id="deleteBookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Konfirmasi Hapus Buku</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin menghapus buku <strong id="deleteBookTitle"></strong> ini?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal untuk Detail atau Aksi Buku -->
+<div class="modal fade" id="bookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookModalLabel">Book Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Isi Modal akan diisi melalui JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <!-- Tombol akan diisi melalui JavaScript berdasarkan role pengguna -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadBooks(); // Memuat buku ketika halaman dimuat
+});
+
+function loadBooks() {
+    fetch('books_with_stock/')
+        .then(response => response.json())
+        .then(updateBookCatalogue);
+}
+
+function searchBooks() {
+    const query = document.getElementById('search-input').value;
+    fetch(`search_book/?query=${query}`)
+        .then(response => response.json())
+        .then(updateBookCatalogue);
+}
+
+function tes() {
+    const query = document.getElementById('search-input').value;
+    fetch('/tes/')
+}
+
+function updateBookCatalogue(booksWithStock) {
+    // console.log(booksWithStock);
+    const booksContainer = document.getElementById('book-catalogue');
+    booksContainer.innerHTML = '';
+    booksWithStock.forEach(book => {
+        const bookCard = `
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="${book.image_url_large}" class="card-img-top" alt="${book.title}">
+                    <div class="card-body">
+                        <h5 class="card-title"><strong>${book.title}</strong></h5>
+                        <p class="card-text">by <strong>${book.author}</strong></p>
+                        <p class="card-text">Rp${book.price}</p>
+                        <p class="card-text">Tersedia: ${book.quantity}</p>
+                        <a href="/catalogue/book/${book.id}" class="btn btn-primary">View Details</a>
+                        <!-- Tambahkan tombol lain berdasarkan role pengguna -->
+                        {% if request.user.is_superuser %}
+                            <button onclick="showDeleteModal(${book.id}, '${book.title.replace(/'/g, "\\'")}')" class="btn btn-danger" data-id="${book.id}">Delete</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        `;
+        booksContainer.innerHTML += bookCard;
+    });
+}
+
+function showDeleteModal(bookId, bookTitle) {
+    var modal = new bootstrap.Modal(document.getElementById('deleteBookModal'));
+    modal.show();
+    document.getElementById('deleteBookTitle').textContent = bookTitle;
+    document.getElementById('confirmDelete').setAttribute('data-id', bookId);
+}
+
+document.getElementById('confirmDelete').addEventListener('click', function() {
+    var bookId = this.getAttribute('data-id');
+    deleteBook(bookId);
+});
+
+function deleteBook(bookId) {
+
+    var url = `/catalogue/book/${bookId}/delete/`;
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({'bookId': bookId})
+    })
+    .then(data => {
+        console.log(data.message); // Handle respons dari server
+        loadBooks(); // Memanggil fungsi loadBooks setelah penghapusan
+        // Menutup modal
+        var deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteBookModal'));
+        deleteModal.hide();
+    })
+    
+}
+
+
+// Fungsi untuk menampilkan modal tambah buku
+function showAddBookModal() {
+    var modal = new bootstrap.Modal(document.getElementById('addBookModal'));
+    modal.show();
+}
+
+// Fungsi untuk menambahkan buku
+function addBook() {
+    fetch("{% url 'catalogue:add_book_ajax' %}", {
+            method: "POST",
+            body: new FormData(document.querySelector('#addBookForm'))
+            
+        }).then(loadBooks)
+
+        document.getElementById("addBookForm").reset()
+        return false
+    }
+
+// Event listener untuk form submit
+document.getElementById("button_add").onclick = addBook
+
+    // Tambahkan fungsi lain untuk edit, delete, tambah/kurang, dan beli buku
+</script>
+{% endblock %}

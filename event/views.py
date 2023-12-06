@@ -8,7 +8,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
 
-@login_required(login_url='/login')
 def show_event(request):
     events = Event.objects.all()
 
@@ -45,7 +44,6 @@ def edit_event(request, id=None):
     context = {'form': form, 'event':event}
     return render(request, "edit_event.html", context)
     
-
 @csrf_exempt
 def create_event(request):
     if request.method == 'POST':
@@ -71,7 +69,3 @@ def remove_event(request):
         response = HttpResponse(status=200)
         return response
     return HttpResponseNotFound()
-
-@csrf_exempt
-def register_event(request, id):
-     return render(request, 'register_event.html', {'id':id})
