@@ -227,7 +227,6 @@
         const registerButton = document.getElementById("button_register");
         if (this.checked) {
             registerButton.removeAttribute("disabled");
-            registerButton
         } else {
             registerButton.setAttribute("disabled", "disabled");
         }
@@ -267,10 +266,22 @@
                             <p class="event-date">${event.fields.date}</p>
                             <p class="event-date">Featuring: ${event.fields.featured_book}</p>
                             <p class="event-description">${event.fields.description}</p>
+                            
+                            {% if user.is_authenticated %}
 
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registrationModal" >
                                 Register
-                            </button>`
+                            </button>
+
+                            {% else %}
+                            
+                            <button type="button" class="btn btn-primary" onclick="location.href='{% url 'home:login' %}'">
+                                Register
+                            </button>
+                            
+                            {% endif %}
+                            `
+                            
             if(isAdmin==true){
                 htmlString+=`
                 <a class="btn btn-primary" href="edit-event/${event.pk}">
@@ -290,6 +301,10 @@
     }
 
     refreshEvent()
+
+    function login() {
+        return fetch("{% url 'home:login' %}")
+    }
 
     function addEvent() {
         
@@ -313,19 +328,9 @@
             if (response.status === 201) {
                 refreshEvent()
                 document.getElementById("form").reset();
-                updateCardPhoto(photo)
             }
         })
-        
-        return false
     }
-
-    function updateCardPhoto(photoUrl) {
-    const cardImage = document.querySelector('.card-img-top');
-    if (cardImage) {
-        cardImage.src = photoUrl;
-    }
-}
    
     function deleteEvent(pk) {
         const formData = new FormData()

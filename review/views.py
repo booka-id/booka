@@ -28,6 +28,7 @@ def get_reviews(request):
     }
     return render(request, 'main.html', context)
 
+@login_required
 def see_review(request, id):
     book = Book.objects.get(pk=id)
     # Calculate the average rating for the specific book
