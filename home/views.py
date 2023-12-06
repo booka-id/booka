@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
-
+@csrf_exempt
 def show_home(request):  
     if request.user.is_authenticated:
         user = request.user.username
@@ -20,6 +20,7 @@ def show_home(request):
     }
     return render(request, "home.html", context=context)
 
+@csrf_exempt
 def login_user(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -35,6 +36,7 @@ def login_user(request):
     context = {}
     return render(request, 'login.html', context)
 
+@csrf_exempt
 def register_user(request):
 
     form = RegisterForm()
@@ -49,12 +51,14 @@ def register_user(request):
     context = {'form':form}
     return render(request, 'register.html', context)
 
+@csrf_exempt
 def logout_user(request):
     logout(request)
     response = HttpResponseRedirect(reverse('home:show_home'))
     response.delete_cookie('last_login')
     return response
 
+@csrf_exempt
 def edit_profile(request, id):
     # Get product berdasarkan ID
     product = User.objects.get(pk = id)

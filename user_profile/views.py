@@ -14,7 +14,7 @@ def show_profile(request):
      }
      return render(request, 'profile.html', context=context)
 
-
+@csrf_exempt
 def add_favorite_book(request):
     if request.method == "POST":
         user_email = request.POST.get("email")
@@ -30,6 +30,8 @@ def add_favorite_book(request):
         return JsonResponse({'message': 'Favorite book added successfully'})
 
     return JsonResponse({'error': 'Invalid request method'})
+
+@csrf_exempt
 def add_wishlist(request):
     if request.method == "POST":
         user_email = request.POST.get("email")
@@ -46,7 +48,7 @@ def add_wishlist(request):
 
     return JsonResponse({'error': 'Invalid request method'})
 
-
+@csrf_exempt
 def get_favorite_book(request, user_email):
     if request.method == "GET":
         # You may want to validate the user and perform any necessary checks here.
@@ -60,6 +62,7 @@ def get_favorite_book(request, user_email):
 
     return JsonResponse({})
 
+@csrf_exempt
 def get_wishlist(request, user_email):
     if request.method == "GET":
         # You may want to validate the user and perform any necessary checks here.
@@ -89,7 +92,7 @@ def get_user_by_username(request):
             return JsonResponse({'error': str(e)}, status=400, content_type="application/json")
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400, content_type="application/json")
-
+@csrf_exempt
 def user_profile_page(request, username):
     user = get_object_or_404(User, username=username)
     # Replace 'user_profile_template.html' with the actual template for the user profile
