@@ -27,6 +27,7 @@ SECRET_KEY = 'django-insecure-@+o8cpm0u$icfvrk_--p1jcqt8sf4wy^&3b0%vo$8+p(i28p&s
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ['https://deploytest-production-cf18.up.railway.app',]
 
 
 # Application definition
@@ -149,5 +150,3 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SAMESITE = 'None'
-
-# CSRF_TRUSTED_ORIGINS = ['*']
