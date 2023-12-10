@@ -7,6 +7,7 @@ import datetime, json
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
 
 @csrf_exempt
 def show_home(request):  
@@ -37,7 +38,7 @@ def login_user(request):
     return render(request, 'login.html', context)
 
 @csrf_exempt
-def register_user(request):
+def register_user(request): 
 
     form = RegisterForm()
    
@@ -79,13 +80,17 @@ def edit_profile(request, id):
 def login_flutter(request):
     username = request.POST['username']
     password = request.POST['password']
-    user = authenticate(username=username, password=password)
+    user = authenticate(request, username=username, password=password)
     if user is not None:
         if user.is_active:
             login(request, user)
             # Status login sukses.
+            print(f"user: {serializers.serialize('json', [user,])}")
             return JsonResponse({
+                #"user": serializers.serialize('json', [user,])
                 "username": user.username,
+                "email": user.email,
+                "image_url": user.image_url,
                 "status": True,
                 "message": "Login sukses!"
                 # Tambahkan data lainnya jika ingin mengirim data ke Flutter.
@@ -125,11 +130,13 @@ def register_flutter(request):
     print(f"Request user: {request.user}")
     
     data = json.loads(request.body)
-    name = data['username']
+    email = data['username']
+    name = data['name']
     passkey = data['password']
+    image_url = data['imageUrl']
     
     try:
-        user = User.objects.create_user(username=name, password=passkey)
+        user = User.objects.create_user(username=name, password=passkey, email=email, image_url=image_url)
         print("User created")
         return JsonResponse({
             "username": name,
