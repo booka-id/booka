@@ -1,3 +1,4 @@
+import json
 from django.http import HttpResponse, HttpResponseRedirect,HttpResponseNotFound, JsonResponse
 from django.core import serializers
 from django.shortcuts import render
@@ -76,7 +77,6 @@ def get_user(request, id):
 @csrf_exempt
 def post_review(request, book_id):
     book = Book.objects.get(pk=book_id)
-    print(request.POST)
     if request.method == 'POST':
         title = request.POST.get("title")
         content = request.POST.get("content")
@@ -92,7 +92,6 @@ def post_review(request, book_id):
         )
         new_review.save()
         url = reverse('review:see_review', args=[book_id])
-        print('halo',url)
         return HttpResponseRedirect(url)
     
     return HttpResponseNotFound()
@@ -122,3 +121,24 @@ def get_rating_ranks(request):
     average_ratings = Book.objects.annotate(avg_rating=Avg('review__rating')).order_by('-avg_rating')[:10]
     books_data = [{'title': book.title, 'author': book.author, 'avg_rating': book.avg_rating,'id':book.pk} for book in average_ratings]
     return JsonResponse(books_data, safe=False)
+
+@csrf_exempt
+def create_review_flutter(request, book_id):
+    print(request.user)
+    book = Book.objects.get(pk=book_id)
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        new_product = Review.objects.create(
+            user = request.user,
+            book=book,
+            title = data["title"],
+            rating = int(data["rating"]),
+            content = data["content"]
+        )
+
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
