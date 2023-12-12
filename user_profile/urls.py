@@ -1,5 +1,6 @@
 from django.urls import path
-from user_profile.views import show_profile, add_favorite_book, get_favorite_book, get_wishlist, add_wishlist, get_user_by_username, user_profile_page
+from user_profile.views import show_profile, add_favorite_book, get_favorite_book, get_wishlist \
+                               ,add_wishlist, get_user_by_username, user_profile_page
 
 app_name = 'user_profile'
 

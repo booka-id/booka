@@ -58,7 +58,7 @@ def get_favorite_book(request, user_email):
 
         if user_profile.favorite_book:
             favorite_book = user_profile.favorite_book
-            return JsonResponse({'favorite_book': favorite_book})
+            return JsonResponse({'book': favorite_book})
 
     return JsonResponse({})
 
@@ -72,7 +72,7 @@ def get_wishlist(request, user_email):
 
         if user_profile.wishlist:
             favorite_book = user_profile.wishlist
-            return JsonResponse({'wishlist': favorite_book})
+            return JsonResponse({'book': favorite_book})
         
     return JsonResponse({})
 

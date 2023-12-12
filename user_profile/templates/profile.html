@@ -256,8 +256,8 @@
             const data = await getFavoriteBook();
             const favoriteBooksDiv = document.getElementById("favoriteBooks");
             favoriteBooksDiv.innerHTML = "";
-            if (data.favorite_book) {
-                const favoriteBookData = JSON.parse(data.favorite_book);
+            if (data.book) {
+                const favoriteBookData = JSON.parse(data.book);
 
                 if (!Array.isArray(favoriteBookData)) {
                     favoriteBookData = [favoriteBookData];
@@ -384,8 +384,8 @@
             const data = await getWishlist();
             const wishlistBooksDiv = document.getElementById("wishlistBook"); // Use the same div as Favorite Books
             wishlistBooksDiv.innerHTML = "";
-            if (data.wishlist) {
-                const wishlistBookData = JSON.parse(data.wishlist);
+            if (data.book) {
+                const wishlistBookData = JSON.parse(data.book);
 
                 if (!Array.isArray(wishlistBookData)) {
                     wishlistBookData = [wishlistBookData];

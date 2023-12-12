@@ -85,7 +85,6 @@ def login_flutter(request):
         if user.is_active:
             login(request, user)
             # Status login sukses.
-            print(f"user: {serializers.serialize('json', [user,])}")
             return JsonResponse({
                 #"user": serializers.serialize('json', [user,])
                 "username": user.username,
