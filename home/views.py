@@ -90,6 +90,8 @@ def login_flutter(request):
                 "username": user.username,
                 "email": user.email,
                 "image_url": user.image_url,
+                "id": user.pk,
+                "is_superuser": user.is_superuser,
                 "status": True,
                 "message": "Login sukses!"
                 # Tambahkan data lainnya jika ingin mengirim data ke Flutter.

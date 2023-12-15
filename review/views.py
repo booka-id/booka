@@ -1,7 +1,7 @@
 import json
 from django.http import HttpResponse, HttpResponseRedirect,HttpResponseNotFound, JsonResponse
 from django.core import serializers
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from book.models import Book
 from django.contrib.auth.decorators import login_required
@@ -124,13 +124,12 @@ def get_rating_ranks(request):
 
 @csrf_exempt
 def create_review_flutter(request, book_id):
-    print(request.user)
     book = Book.objects.get(pk=book_id)
     if request.method == 'POST':
         data = json.loads(request.body)
 
         new_product = Review.objects.create(
-            user = request.user,
+            user = get_object_or_404(User, email = data["email"]),
             book=book,
             title = data["title"],
             rating = int(data["rating"]),
