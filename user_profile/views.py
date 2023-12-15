@@ -27,16 +27,17 @@ def add_favorite_book(request):
         user_profile.favorite_book = json_data
         user_profile.save()
 
-        return JsonResponse({'message': 'Favorite book added successfully'})
+        return JsonResponse({'message': 'success'})
 
     return JsonResponse({'error': 'Invalid request method'})
 
 @csrf_exempt
 def add_wishlist(request):
     if request.method == "POST":
+        print(request.POST)
         user_email = request.POST.get("email")
         json_data = request.POST.get("json_data")
-
+        
         # You may want to validate the user and JSON data here.
         # For example, check if the user exists and if the JSON data is in the correct format.
 
@@ -44,7 +45,7 @@ def add_wishlist(request):
         user_profile.wishlist = json_data
         user_profile.save()
 
-        return JsonResponse({'message': 'Favorite book added successfully'})
+        return JsonResponse({'message': 'success'})
 
     return JsonResponse({'error': 'Invalid request method'})
 

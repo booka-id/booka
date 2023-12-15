@@ -209,6 +209,7 @@
                         </div>`;
 
                         jsonInput.value = JSON.stringify(selectedBooks);
+                        console.log(jsonInput.value);
 
                         inputField.value = "";
                         field.innerHTML = "";
@@ -250,11 +251,13 @@
 
         async function getFavoriteBook() {
             return fetch(getFavoriteBookURL).then((response) => response.json());
+            
         }
 
         async function refreshFavoriteBooks() {
             const data = await getFavoriteBook();
             const favoriteBooksDiv = document.getElementById("favoriteBooks");
+            console.log(data.book);
             favoriteBooksDiv.innerHTML = "";
             if (data.book) {
                 const favoriteBookData = JSON.parse(data.book);
