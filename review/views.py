@@ -110,8 +110,32 @@ def get_books_by_author(request,author):
     return HttpResponse(serializers.serialize('json', filteredBooks), content_type='application/json')
 
 def get_books_by_id(request,book_id):
-    filteredBooks = Book.objects.filter(pk=book_id)
-    return HttpResponse(serializers.serialize('json', filteredBooks), content_type='application/json')
+    book = Book.objects.filter(pk=book_id).first()
+    
+    if book:
+        # Dapatkan nilai rata-rata dari ulasan untuk buku tersebut
+        avg_rating = Review.objects.filter(book=book_id).aggregate(avg_rating=Avg('rating'))
+
+        # Buat dictionary dengan informasi buku dan nilai rata-rata
+        book_data = {
+            'id': book.pk,
+            'title': book.title,
+            'author': book.author,
+            'avg_rating': avg_rating['avg_rating'] if avg_rating['avg_rating'] else None,
+            # Tambahkan bidang lain dari objek buku yang ingin Anda sertakan di sini
+            "isbn": book.isbn,
+            "year": book.year,
+            "publisher": book.publisher,
+            "image_url_small": book.image_url_small,
+            "image_url_medium": book.image_url_medium,
+            "image_url_large":book.image_url_large
+        }
+
+        # Kembalikan respons JSON dengan data buku dan nilai rata-rata
+        return JsonResponse(book_data)
+    else:
+        # Jika buku tidak ditemukan, kembalikan respons JSON dengan pesan error
+        return JsonResponse({'error': 'Book not found'}, status=404)
 
 def get_ranks(request):
     top_books = Book.objects.annotate(num_reviews=Count('review')).order_by('-num_reviews')[:10]
