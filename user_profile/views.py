@@ -93,9 +93,29 @@ def get_user_by_username(request):
             return JsonResponse({'error': str(e)}, status=400, content_type="application/json")
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400, content_type="application/json")
+    
 @csrf_exempt
 def user_profile_page(request, username):
     user = get_object_or_404(User, username=username)
     # Replace 'user_profile_template.html' with the actual template for the user profile
     return render(request, 'visiting_profile.html', {'user': user})
+
+@csrf_exempt
+def change_profile_pic(request):
+    if request.method == "POST":
+        print(request.POST)
+        user_email = request.POST.get("email")
+        new_pfp = request.POST.get("profile_picture")
+        
+        # You may want to validate the user and JSON data here.
+        # For example, check if the user exists and if the JSON data is in the correct format.
+
+        user_profile = get_object_or_404(User, email=user_email)
+        user_profile.image_url = new_pfp
+        user_profile.save()
+
+        return JsonResponse({'message': 'success'})
+
+    return JsonResponse({'error': 'Invalid request method'})
+
 # Create your views here.
