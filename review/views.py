@@ -143,7 +143,13 @@ def get_ranks(request):
 
 def get_rating_ranks(request):
     average_ratings = Book.objects.annotate(avg_rating=Avg('review__rating')).order_by('-avg_rating')[:10]
-    books_data = [{'title': book.title, 'author': book.author, 'avg_rating': book.avg_rating,'id':book.pk} for book in average_ratings]
+    books_data = [{
+        'title': book.title, 
+        'author': book.author, 
+        'avg_rating': book.avg_rating,
+        'image_url': book.image_url_large,
+        'id':book.pk}
+         for book in average_ratings]
     return JsonResponse(books_data, safe=False)
 
 @csrf_exempt
