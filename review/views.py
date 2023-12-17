@@ -1,6 +1,7 @@
+import json
 from django.http import HttpResponse, HttpResponseRedirect,HttpResponseNotFound, JsonResponse
 from django.core import serializers
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from book.models import Book
 from django.contrib.auth.decorators import login_required
@@ -76,7 +77,6 @@ def get_user(request, id):
 @csrf_exempt
 def post_review(request, book_id):
     book = Book.objects.get(pk=book_id)
-    print(request.POST)
     if request.method == 'POST':
         title = request.POST.get("title")
         content = request.POST.get("content")
@@ -92,7 +92,6 @@ def post_review(request, book_id):
         )
         new_review.save()
         url = reverse('review:see_review', args=[book_id])
-        print('halo',url)
         return HttpResponseRedirect(url)
     
     return HttpResponseNotFound()
@@ -111,8 +110,32 @@ def get_books_by_author(request,author):
     return HttpResponse(serializers.serialize('json', filteredBooks), content_type='application/json')
 
 def get_books_by_id(request,book_id):
-    filteredBooks = Book.objects.filter(pk=book_id)
-    return HttpResponse(serializers.serialize('json', filteredBooks), content_type='application/json')
+    book = Book.objects.filter(pk=book_id).first()
+    
+    if book:
+        # Dapatkan nilai rata-rata dari ulasan untuk buku tersebut
+        avg_rating = Review.objects.filter(book=book_id).aggregate(avg_rating=Avg('rating'))
+
+        # Buat dictionary dengan informasi buku dan nilai rata-rata
+        book_data = {
+            'id': book.pk,
+            'title': book.title,
+            'author': book.author,
+            'avg_rating': avg_rating['avg_rating'] if avg_rating['avg_rating'] else None,
+            # Tambahkan bidang lain dari objek buku yang ingin Anda sertakan di sini
+            "isbn": book.isbn,
+            "year": book.year,
+            "publisher": book.publisher,
+            "image_url_small": book.image_url_small,
+            "image_url_medium": book.image_url_medium,
+            "image_url_large":book.image_url_large
+        }
+
+        # Kembalikan respons JSON dengan data buku dan nilai rata-rata
+        return JsonResponse(book_data)
+    else:
+        # Jika buku tidak ditemukan, kembalikan respons JSON dengan pesan error
+        return JsonResponse({'error': 'Book not found'}, status=404)
 
 def get_ranks(request):
     top_books = Book.objects.annotate(num_reviews=Count('review')).order_by('-num_reviews')[:10]
@@ -122,3 +145,23 @@ def get_rating_ranks(request):
     average_ratings = Book.objects.annotate(avg_rating=Avg('review__rating')).order_by('-avg_rating')[:10]
     books_data = [{'title': book.title, 'author': book.author, 'avg_rating': book.avg_rating,'id':book.pk} for book in average_ratings]
     return JsonResponse(books_data, safe=False)
+
+@csrf_exempt
+def create_review_flutter(request, book_id):
+    book = Book.objects.get(pk=book_id)
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        new_product = Review.objects.create(
+            user = get_object_or_404(User, email = data["email"]),
+            book=book,
+            title = data["title"],
+            rating = int(data["rating"]),
+            content = data["content"]
+        )
+
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)

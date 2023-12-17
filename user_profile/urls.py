@@ -1,5 +1,6 @@
 from django.urls import path
-from user_profile.views import show_profile, add_favorite_book, get_favorite_book, get_wishlist, add_wishlist, get_user_by_username, user_profile_page
+from user_profile.views import show_profile, add_favorite_book, get_favorite_book, get_wishlist \
+                               ,add_wishlist, get_user_by_username, user_profile_page, change_profile_pic
 
 app_name = 'user_profile'
 
@@ -11,6 +12,7 @@ urlpatterns = [
      path('get_wishlist/<str:user_email>/', get_wishlist, name='get_wishlist'),
      path('user_by_username/', get_user_by_username, name='user_by_username'),
      path('go_to/<str:username>/', user_profile_page, name='go_to_user_profile'),
+     path('change_profile_pic/', change_profile_pic, name='change_profile_pic'),
      
 
 ]

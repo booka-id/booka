@@ -30,12 +30,13 @@ class CostumUserManager(UserManager):
         
 class User(AbstractUser, PermissionsMixin):
     profile_pic = models.ImageField(null=True ,blank=True, upload_to='profile_pics/')
+    image_url = models.URLField(null=True, blank=True)
     favorite_book = models.JSONField(default=dict, null=True, blank=True)
     wishlist = models.JSONField(default=dict, null=True, blank=True)
     bio = models.TextField(_('bio'), max_length=500, blank=True)
     email= models.EmailField(_('email'),blank=True, default='', unique=True)
-    first_name = models.CharField(max_length=255, blank=True, default='')
-    last_name = models.CharField(max_length=255, blank=True, default='')
+    first_name = models.CharField(max_length=255, null=True,blank=True, default='')
+    last_name = models.CharField(max_length=255, null=True,blank=True, default='')
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)

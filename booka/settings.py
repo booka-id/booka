@@ -27,6 +27,7 @@ SECRET_KEY = 'django-insecure-@+o8cpm0u$icfvrk_--p1jcqt8sf4wy^&3b0%vo$8+p(i28p&s
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ['https://deploytest-production-cf18.up.railway.app',]
 
 
 # Application definition
@@ -44,9 +45,11 @@ INSTALLED_APPS = [
     'review',
     'user_profile',
     'book',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -140,3 +143,10 @@ AUTH_USER_MODEL = "user_profile.User"
 # Login required redirect
 
 LOGIN_URL = '/login/'
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'

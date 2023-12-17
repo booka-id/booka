@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import get_reviews, see_review, get_reviews_by_id, get_user,post_review,delete_review
+from .views import create_review_flutter, get_reviews, see_review, get_reviews_by_id, get_user,post_review,delete_review
 from .views import get_books_by_author, write_review, get_ranks, get_all_reviews, get_books_by_id
 from .views import get_reviews_by_user, get_rating_ranks, get_one_review
 
@@ -12,6 +12,7 @@ urlpatterns = [
     path('get_user/<int:id>', get_user, name='get_user'),
     path('user/<int:user_id>', get_reviews_by_user, name='get_reviews_by_user'),
     path('post/<int:book_id>', post_review, name='post_review'),
+    path('post-flutter/<int:book_id>', create_review_flutter, name='create_review_flutter'),
     path('delete/<int:review_id>', delete_review, name='delete_review'),
     path('write/<int:book_id>', write_review, name='write_review'),
     path('books/<int:book_id>', get_books_by_id, name='get_books_by_id'),
