@@ -347,3 +347,26 @@ def buy_book_ajax(request):
         return JsonResponse({'status': 'success', 'message': 'Purchase completed successfully', 'new_stock_quantity': stock.quantity})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+    
+@csrf_exempt
+def buy_book_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user_id = int(data.get('user_id'))
+        book_id = int(data.get('book_id'))
+        quantity = int(data.get('quantity'))
+        payment_method = data.get('payment_method')
+
+        user = get_object_or_404(User, pk=user_id)
+        # Proses pembelian buku
+        book = get_object_or_404(Book, id=book_id)
+        stock = get_object_or_404(BookStock, id=book_id)
+        stock.quantity -= quantity
+        stock.save()
+        # Misalkan Anda memiliki proses untuk membuat record pembelian
+        purchase = BookPurchase.objects.create(book=book, user=user, quantity=quantity, payment_method=payment_method)
+        # Logika tambahan jika diperlukan
+
+        return JsonResponse({'status': 'success', 'message': 'Purchase completed successfully'}, status=200)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)

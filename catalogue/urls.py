@@ -1,5 +1,5 @@
 from django.urls import path
-from catalogue.views import add_book_flutter, buy_book_ajax, delete_book_flutter, edit_book_flutter, get_book_by_id, get_books_with_stock, get_bookstock_by_id, get_buy_flutter, get_buy_json, search_books, show_catalogue, add_book, show_json, detail_book, buy_book, delete_book, edit_book, add_book_ajax, get_book_json, get_bookstock_json, search_book, pay_book
+from catalogue.views import add_book_flutter, buy_book_ajax, buy_book_flutter, delete_book_flutter, edit_book_flutter, get_book_by_id, get_books_with_stock, get_bookstock_by_id, get_buy_flutter, get_buy_json, search_books, show_catalogue, add_book, show_json, detail_book, buy_book, delete_book, edit_book, add_book_ajax, get_book_json, get_bookstock_json, search_book, pay_book
 
 app_name = 'catalogue'
 
@@ -23,6 +23,7 @@ urlpatterns = [
     path('add-book-flutter/', add_book_flutter, name='add_book_flutter'),
     path('delete-book-flutter/<int:pk>/', delete_book_flutter, name='delete_book_flutter'),
     path('edit-book-flutter/<int:pk>/', edit_book_flutter, name='edit_book_flutter'),
+    path('buy-book-flutter/', buy_book_flutter, name='buy_book_flutter'),
     path('buy-book-ajax/', buy_book_ajax, name='buy_book_ajax'),
     path('get-bookpurchase/<int:userID>/', get_buy_flutter, name='get_buy_flutter'),
 ]
