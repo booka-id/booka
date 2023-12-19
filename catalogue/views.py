@@ -1,13 +1,15 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.http import HttpResponse, HttpResponseNotFound
 from django.core import serializers
 from django.urls import reverse
 from book.models import Book
-from catalogue.models import BookStock
+from catalogue.models import BookPurchase, BookStock
 from catalogue.forms import BookForm, BookStockForm, AddBookForm
+from user_profile.models import User
 
 # Create your views here.
 def get_catalogue(request):
@@ -130,17 +132,20 @@ def pay_book(request, pk):
 def delete_book(request, pk):
     if request.method == "POST":
         book = get_object_or_404(Book, pk=pk)
-        print("aa")
         book_stock = get_object_or_404(BookStock, book=book)
-        print("bbbb")
         book.delete()
         book_stock.delete()
         return JsonResponse({'status': 'success', 'message': 'Buku berhasil dihapus.'})
     
 
 def show_json(request):
-    data = BookStock.objects.all()
-    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+    # Ambil semua objek BookStock dan prefetch_related untuk detail buku
+    data = BookStock.objects.all().select_related('book')
+    
+    # Serialisasi data dengan format yang diinginkan
+    serialized_data = serializers.serialize("json", data, use_natural_primary_keys=True, fields=('book', 'quantity', 'price'))
+    
+    return HttpResponse(serialized_data, content_type="application/json")
 
 @login_required(login_url='/login')
 def edit_book(request, pk):
@@ -171,6 +176,38 @@ def get_book_json(request):
 def get_bookstock_json(request):
     bookstock_item = BookStock.objects.all()
     return HttpResponse(serializers.serialize('json', bookstock_item))
+
+def get_buy_json(request):
+    book_item = BookPurchase.objects.all()
+    return HttpResponse(serializers.serialize('json', book_item))
+
+def get_book_by_id(request, book_id):
+    try:
+        book = Book.objects.get(id=book_id)
+    except Book.DoesNotExist:
+        raise Http404("Buku tidak ditemukan")
+
+    return HttpResponse(serializers.serialize("json", [book]),
+                        content_type="application/json")
+
+def get_bookstock_by_id(request, book_id):
+    try: 
+        bookstock = BookStock.objects.get(id=book_id)
+    except BookStock.DoesNotExist:
+        raise Http404("Buku tidak ditemukan")
+
+    return HttpResponse(serializers.serialize("json", [bookstock]),
+                        content_type="application/json")
+
+def get_buy_flutter(request, userID):
+    user = get_object_or_404(User, pk=userID)
+    if user.id == userID or user.is_superuser:
+        # Dapatkan semua pembelian yang dilakukan oleh pengguna dengan userID
+        book_purchases = BookPurchase.objects.filter(user=user)
+        data = serializers.serialize('json', book_purchases)
+        return HttpResponse(data, content_type='application/json')
+    else:
+        return HttpResponse('Unauthorized', status=401)
 
 def search_book(request):
     if 'search_query' in request.GET:
@@ -219,5 +256,94 @@ def get_books_with_stock(request):
     return JsonResponse(books_with_stock, safe=False)
 
 
-def tes_satu(request):
+@csrf_exempt
+def add_book_flutter(request):
+    if request.method == 'POST':
+        
+        data = json.loads(request.body)
+
+        new_book = Book.objects.create(
+            isbn = data["isbn"],
+            title = data["title"],
+            author = data["author"],
+            year = int(data["year"]),
+            publisher = data["publisher"],
+            image_url_small = data["image_url_large"],
+            image_url_medium = data["image_url_large"],
+            image_url_large = data["image_url_large"],
+        )
+
+        new_book.save()
+
+        new_bookstock = BookStock.objects.create(
+            book = new_book,
+            quantity = int(data["quantity"]),
+            price = int(data["price"])
+        )
+
+        new_bookstock.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
+def delete_book_flutter(request, pk):
     print("ayam")
+    if request.method == "POST":
+        book = get_object_or_404(Book, pk=pk)
+        print(book)
+        book_stock = get_object_or_404(BookStock, book=book)
+        print(book_stock)
+        book.delete()
+        book_stock.delete()
+        return JsonResponse({'status': 'success', 'message': 'Buku berhasil dihapus.'}, status=200) 
+
+@csrf_exempt
+def edit_book_flutter(request, pk):
+    print("aaaa")
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            isbn = data['isbn']
+            title = data['title']
+            author = data['author']
+            year = data['year']
+            publisher = data['publisher']
+            image_url = data['image_url']
+            quantity = data['quantity']
+            price = data['price']
+
+            book = Book.objects.get(pk = pk)
+            book.edit_book(isbn, title, author, year, publisher, image_url)
+
+            book_stock = BookStock.objects.get(pk = pk)
+            book_stock.edit_stock(quantity, price)
+
+            return JsonResponse({'message': 'Book and stock updated successfully'}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'message': 'Invalid request'}, status=400)
+    
+@csrf_exempt
+def buy_book_ajax(request):
+    if request.method == 'POST':
+        user = request.user
+        data = json.loads(request.body)
+        book_id = data.get('bookId')
+        quantity = int(data.get('quantity'))
+        payment_method = data.get('paymentMethod')
+
+        # Proses pembelian buku
+        book = get_object_or_404(Book, id=book_id)
+        stock = get_object_or_404(BookStock, id=book_id)
+        stock.quantity -= quantity
+        stock.save()
+        # Misalkan Anda memiliki proses untuk membuat record pembelian
+        purchase = BookPurchase.objects.create(book=book, user=user, quantity=quantity, payment_method=payment_method)
+        # Logika tambahan jika diperlukan
+
+        return JsonResponse({'status': 'success', 'message': 'Purchase completed successfully', 'new_stock_quantity': stock.quantity})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)

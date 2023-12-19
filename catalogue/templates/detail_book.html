@@ -36,12 +36,16 @@
             <p><strong>Publisher:</strong> {{ publisher }}</p>
             <p><strong>ISBN:</strong> {{ isbn }}</p>
             <p><strong>Price:</strong> {{ price }}</p>
-            <p><strong>Quantity in Stock:</strong> {{ quantity }}</p>
+            <p><strong>Quantity in Stock:</strong> <span id="stockQuantity">{{ quantity }}</span></p>
 
             <!-- Tombol Aksi -->
             <a href="/review/{{ id }}" class="btn btn-secondary">View Reviews</a>
             <a href="/event/" class="btn btn-info">View Events</a>
-            <button id="buyBookBtn" class="btn btn-success">Buy Book</button>
+            {% if user.is_superuser %}
+                <a href="/catalogue/book/{{ id }}/edit" class="btn btn-success">Edit Book</a>
+            {% else %}
+                <button id="buyBookBtn" class="btn btn-success">Buy Book</button>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -88,18 +92,22 @@
 <script>
     // Harga per unit buku
     var pricePerUnit = parseInt('{{ price }}'); // Mengubah string menjadi float
+    var bookId = '{{ id }}';
+    var buyBookModal = new bootstrap.Modal(document.getElementById('buyBookModal'));
+
 
     // Fungsi untuk mengupdate total harga berdasarkan quantity
     function updateTotalPrice() {
-        var quantity = document.getElementById('quantity').value;
-        var totalPrice = quantity * pricePerUnit;
-        // Format total harga sebagai angka dengan pemisah ribuan
-        var formatter = new Intl.NumberFormat('id-ID', {
-            style: 'decimal',
-            maximumFractionDigits: 0,  // Tidak menggunakan angka desimal
-        });
-
-        document.getElementById('totalPrice').textContent = formatter.format(totalPrice);
+        var totalPriceElement = document.getElementById('totalPrice');
+        if (totalPriceElement) {
+            var quantity = document.getElementById('quantity').value;
+            var totalPrice = quantity * pricePerUnit;
+            var formatter = new Intl.NumberFormat('id-ID', {
+                style: 'decimal',
+                maximumFractionDigits: 0,
+            });
+            totalPriceElement.textContent = formatter.format(totalPrice);
+        }
     }
 
 
@@ -113,35 +121,46 @@
         var paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
 
         // Kirim permintaan AJAX ke server
-        fetch('/path/to/your/purchase/endpoint', {
+        fetch('/catalogue/buy-book-ajax/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token }}',
             },
             body: JSON.stringify({
-                bookId: '{{ book.id }}',
+                bookId: bookId,
                 quantity: quantity,
                 paymentMethod: paymentMethod
             })
         })
         .then(response => response.json())
         .then(data => {
+            if (data.status === 'success') {
+                // Perbarui tampilan dengan data terbaru
+                document.getElementById('quantity').value = '1'; // Reset jumlah pembelian ke 1
+                const stockQuantityElem = document.getElementById('stockQuantity');
+                if (stockQuantityElem) {
+                    stockQuantityElem.textContent = data.new_stock_quantity; // Gunakan stok baru
+                } else {
+                    console.error('Elemen stockQuantity tidak ditemukan');
+                }
+                // document.getElementById('stockQuantity').textContent = data.new_stock_quantity; // Asumsikan Anda memiliki elemen untuk jumlah stok
+                // ... kode lain untuk feedback ke pengguna ...
+            }
             // Tindak lanjuti respons dari server
             console.log(data);
             // Tutup modal
-            var modal = bootstrap.Modal.getInstance(document.getElementById('buyBookModal'));
-            modal.hide();
+            buyBookModal.hide();
         })
         .catch(error => {
             console.error('Error:', error);
+            buyBookModal.hide();
         });
     }
 
     // Tombol 'Beli Buku' membuka modal
     document.getElementById('buyBookBtn').addEventListener('click', function() {
-        var modal = new bootstrap.Modal(document.getElementById('buyBookModal'));
-        modal.show();
+        buyBookModal.show();
     });
 
     // Submit form pembelian
